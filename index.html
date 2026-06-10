@@ -4,626 +4,163 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Annuaire de la Couleur Végétale</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --vert: #4a7c59; --vert-clair: #7aad8a; --vert-pale: #eef4f0;
-    --terre: #8b5e3c; --beige: #f5f0e8; --texte: #2d2d2d;
-    --gris: #6b7280; --blanc: #ffffff; --ombre: 0 4px 20px rgba(0,0,0,0.08);
+  :root { --vert: #4a7c59; --vert-clair: #7aad8a; --vert-pale: #eef4f0; --gris: #6b7280; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #2d5a3d 0%, #4a7c59 50%, #7aad8a 100%);
+    display: flex; align-items: center; justify-content: center;
   }
-  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--beige); color: var(--texte); min-height: 100vh; }
-
-  /* AUTH OVERLAY */
-  #auth-overlay {
-    position: fixed; inset: 0; background: linear-gradient(135deg, #2d5a3d 0%, #4a7c59 50%, #7aad8a 100%);
-    display: flex; align-items: center; justify-content: center; z-index: 1000;
+  .box {
+    background: white; border-radius: 24px; padding: 44px; width: 100%;
+    max-width: 440px; box-shadow: 0 24px 60px rgba(0,0,0,0.2); margin: 20px;
   }
-  #auth-overlay.hidden { display: none; }
-  .auth-box {
-    background: white; border-radius: 20px; padding: 40px; width: 100%; max-width: 440px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.2); margin: 20px;
-  }
-  .auth-logo { text-align: center; margin-bottom: 28px; }
-  .auth-logo .icon { font-size: 48px; display: block; margin-bottom: 12px; }
-  .auth-logo h1 { font-size: 1.4rem; font-weight: 800; color: var(--vert); }
-  .auth-logo p { font-size: 0.85rem; color: var(--gris); margin-top: 4px; }
-  .auth-tabs { display: flex; border-bottom: 2px solid #e5e7eb; margin-bottom: 24px; }
-  .auth-tab {
-    flex: 1; padding: 12px; text-align: center; cursor: pointer; font-size: 0.9rem;
-    font-weight: 600; color: var(--gris); border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s;
-  }
-  .auth-tab.active { color: var(--vert); border-bottom-color: var(--vert); }
-  .auth-form { display: none; }
-  .auth-form.active { display: block; }
-  .auth-group { margin-bottom: 16px; }
-  .auth-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
-  .auth-group input {
-    width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px;
-    font-size: 0.9rem; outline: none; transition: border 0.2s;
-  }
-  .auth-group input:focus { border-color: var(--vert); box-shadow: 0 0 0 3px rgba(74,124,89,0.1); }
-  .auth-btn {
-    width: 100%; padding: 13px; background: linear-gradient(135deg, var(--vert), #2d5a3d);
-    color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 700;
-    cursor: pointer; transition: all 0.2s; margin-top: 4px;
-  }
-  .auth-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(74,124,89,0.35); }
-  .auth-msg { font-size: 0.82rem; text-align: center; margin-top: 12px; min-height: 20px; }
-  .auth-msg.error { color: #dc2626; }
-  .auth-msg.success { color: var(--vert); }
-  .auth-divider { text-align: center; margin: 16px 0; font-size: 0.8rem; color: var(--gris); }
-
-  /* HEADER */
-  header {
-    background: linear-gradient(135deg, var(--vert) 0%, #2d5a3d 100%);
-    color: white; padding: 18px 32px; display: flex; align-items: center;
-    justify-content: space-between; box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-  }
-  .header-logo { display: flex; align-items: center; gap: 12px; }
-  .header-logo .icon { font-size: 28px; }
-  header h1 { font-size: 1.2rem; font-weight: 700; }
-  header p { font-size: 0.8rem; opacity: 0.8; margin-top: 2px; }
-  .header-right { display: flex; align-items: center; gap: 12px; }
-  .user-info { font-size: 0.82rem; opacity: 0.85; }
-  .btn-logout {
-    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
-    color: white; padding: 7px 14px; border-radius: 20px; font-size: 0.8rem;
-    font-weight: 600; cursor: pointer; transition: all 0.2s;
-  }
-  .btn-logout:hover { background: rgba(255,255,255,0.25); }
-
-  /* TABS */
-  .tabs { display: flex; background: white; border-bottom: 1px solid #e5e7eb; padding: 0 32px; box-shadow: var(--ombre); }
+  .logo { text-align: center; margin-bottom: 32px; }
+  .logo .icon { font-size: 52px; display: block; margin-bottom: 14px; }
+  .logo h1 { font-size: 1.5rem; font-weight: 800; color: var(--vert); }
+  .logo p { font-size: 0.88rem; color: var(--gris); margin-top: 6px; line-height: 1.5; }
+  .tabs { display: flex; border-bottom: 2px solid #e5e7eb; margin-bottom: 26px; }
   .tab {
-    padding: 15px 22px; cursor: pointer; font-size: 0.88rem; font-weight: 500;
-    color: var(--gris); border-bottom: 3px solid transparent; transition: all 0.2s;
-    display: flex; align-items: center; gap: 7px;
+    flex: 1; padding: 12px; text-align: center; cursor: pointer;
+    font-size: 0.9rem; font-weight: 600; color: var(--gris);
+    border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s;
   }
-  .tab:hover { color: var(--vert); }
-  .tab.active { color: var(--vert); border-bottom-color: var(--vert); font-weight: 600; }
-
-  /* PANELS */
-  .panel { display: none; }
-  .panel.active { display: block; }
-  #panel-carte.active { display: flex; flex-direction: column; }
-
-  /* CARTE */
-  .carte-layout { display: flex; height: calc(100vh - 120px); }
-  #map { flex: 1; z-index: 1; }
-  .sidebar { width: 320px; background: white; overflow-y: auto; border-left: 1px solid #e5e7eb; display: flex; flex-direction: column; }
-  .sidebar-header { padding: 18px; border-bottom: 1px solid #e5e7eb; background: var(--vert-pale); }
-  .sidebar-header h3 { font-size: 0.9rem; font-weight: 700; color: var(--vert); margin-bottom: 8px; }
-  .search-box { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.85rem; outline: none; }
-  .search-box:focus { border-color: var(--vert); }
-  .filter-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-  .filter-tag {
-    padding: 4px 10px; border-radius: 12px; font-size: 0.74rem; font-weight: 600;
-    cursor: pointer; border: 1.5px solid transparent; transition: all 0.2s;
+  .tab.active { color: var(--vert); border-bottom-color: var(--vert); }
+  .form { display: none; }
+  .form.active { display: block; }
+  .group { margin-bottom: 18px; }
+  .group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
+  .group input {
+    width: 100%; padding: 12px 14px; border: 1.5px solid #e5e7eb;
+    border-radius: 10px; font-size: 0.92rem; outline: none; transition: border 0.2s;
   }
-  .count-badge { font-size: 0.8rem; font-weight: 600; color: var(--gris); padding: 8px 18px; background: var(--vert-pale); border-bottom: 1px solid #e5e7eb; text-align: center; }
-  .acteurs-list { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-  .acteur-card {
-    background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 13px;
-    cursor: pointer; transition: all 0.2s; border-left: 4px solid var(--vert);
+  .group input:focus { border-color: var(--vert); box-shadow: 0 0 0 3px rgba(74,124,89,0.1); }
+  .btn {
+    width: 100%; padding: 14px; background: linear-gradient(135deg, var(--vert), #2d5a3d);
+    color: white; border: none; border-radius: 10px; font-size: 1rem;
+    font-weight: 700; cursor: pointer; transition: all 0.2s;
   }
-  .acteur-card:hover { box-shadow: 0 4px 12px rgba(74,124,89,0.15); transform: translateY(-1px); }
-  .acteur-card.selected { background: var(--vert-pale); }
-  .acteur-name { font-weight: 700; font-size: 0.88rem; margin-bottom: 3px; }
-  .acteur-meta { font-size: 0.76rem; color: var(--gris); margin-bottom: 5px; }
-  .acteur-tag { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 0.7rem; font-weight: 600; margin-right: 3px; }
-  .empty-state { text-align: center; padding: 40px 20px; color: var(--gris); font-size: 0.88rem; }
-
-  /* FORMULAIRE */
-  #panel-formulaire { padding: 36px 32px; max-width: 700px; margin: 0 auto; }
-  .form-title { margin-bottom: 28px; }
-  .form-title h2 { font-size: 1.5rem; font-weight: 800; color: var(--vert); margin-bottom: 6px; }
-  .form-title p { color: var(--gris); font-size: 0.92rem; line-height: 1.6; }
-  .form-card { background: white; border-radius: 16px; padding: 30px; box-shadow: var(--ombre); }
-  .form-section { margin-bottom: 26px; }
-  .form-section-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--vert); margin-bottom: 14px; padding-bottom: 7px; border-bottom: 2px solid var(--vert-pale); }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .form-group { display: flex; flex-direction: column; gap: 5px; }
-  .form-group.full { grid-column: 1 / -1; }
-  label { font-size: 0.83rem; font-weight: 600; }
-  label span.req { color: #e53e3e; margin-left: 2px; }
-  input[type=text], input[type=email], input[type=url], input[type=password], textarea, select {
-    padding: 10px 13px; border: 1.5px solid #e5e7eb; border-radius: 8px;
-    font-size: 0.88rem; font-family: inherit; outline: none; transition: border 0.2s;
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(74,124,89,0.35); }
+  .msg { font-size: 0.83rem; text-align: center; margin-top: 12px; min-height: 20px; padding: 8px; border-radius: 8px; }
+  .msg.error { background: #fef2f2; color: #dc2626; }
+  .msg.success { background: var(--vert-pale); color: var(--vert); }
+  .divider { text-align: center; margin-top: 20px; font-size: 0.82rem; color: var(--gris); }
+  .divider a { color: var(--vert); font-weight: 600; text-decoration: none; }
+  .public-link {
+    margin-top: 24px; padding: 16px; background: var(--vert-pale);
+    border-radius: 12px; text-align: center;
   }
-  input:focus, textarea:focus, select:focus { border-color: var(--vert); box-shadow: 0 0 0 3px rgba(74,124,89,0.1); }
-  textarea { resize: vertical; min-height: 85px; }
-  .checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; }
-  .checkbox-item {
-    display: flex; align-items: center; gap: 7px; padding: 7px 12px;
-    border: 1.5px solid #e5e7eb; border-radius: 8px; cursor: pointer;
-    transition: all 0.2s; font-size: 0.83rem;
+  .public-link p { font-size: 0.82rem; color: var(--gris); margin-bottom: 8px; }
+  .public-link a {
+    display: inline-block; color: var(--vert); font-weight: 700;
+    font-size: 0.88rem; text-decoration: none;
   }
-  .checkbox-item:hover { border-color: var(--vert-clair); background: var(--vert-pale); }
-  .checkbox-item input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--vert); }
-  .checkbox-item.checked { border-color: var(--vert); background: var(--vert-pale); font-weight: 600; }
-  .btn-submit {
-    width: 100%; padding: 13px; background: linear-gradient(135deg, var(--vert), #2d5a3d);
-    color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 700;
-    cursor: pointer; transition: all 0.2s; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
-  .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(74,124,89,0.35); }
-  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-  .form-msg { font-size: 0.85rem; text-align: center; margin-top: 14px; padding: 12px; border-radius: 8px; display: none; }
-  .form-msg.success { background: var(--vert-pale); color: var(--vert); border: 1px solid var(--vert-clair); display: block; }
-  .form-msg.error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; display: block; }
-
-  /* MON PROFIL */
-  #panel-profil { padding: 36px 32px; max-width: 700px; margin: 0 auto; }
-  #panel-profil h2 { font-size: 1.4rem; font-weight: 800; color: var(--vert); margin-bottom: 6px; }
-  #panel-profil .subtitle { color: var(--gris); font-size: 0.9rem; margin-bottom: 28px; }
-
-  .loading { text-align: center; padding: 60px; color: var(--gris); }
-  .spinner { display: inline-block; width: 32px; height: 32px; border: 3px solid #e5e7eb; border-top-color: var(--vert); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  @media (max-width: 768px) {
-    .carte-layout { flex-direction: column; height: auto; }
-    #map { height: 50vh; }
-    .sidebar { width: 100%; height: 45vh; }
-    .form-grid { grid-template-columns: 1fr; }
-    header { padding: 14px 18px; }
-    .tabs { padding: 0 12px; overflow-x: auto; }
-    #panel-formulaire, #panel-profil { padding: 24px 18px; }
-  }
+  .public-link a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
-
-<!-- AUTH OVERLAY -->
-<div id="auth-overlay">
-  <div class="auth-box">
-    <div class="auth-logo">
-      <span class="icon">🌿</span>
-      <h1>Couleur Végétale</h1>
-      <p>Annuaire des acteurs en France</p>
-    </div>
-    <div class="auth-tabs">
-      <div class="auth-tab active" onclick="switchAuthTab('login')">Se connecter</div>
-      <div class="auth-tab" onclick="switchAuthTab('signup')">S'inscrire</div>
-    </div>
-
-    <!-- LOGIN -->
-    <div class="auth-form active" id="form-login">
-      <div class="auth-group">
-        <label>Email</label>
-        <input type="email" id="login-email" placeholder="votre@email.fr">
-      </div>
-      <div class="auth-group">
-        <label>Mot de passe</label>
-        <input type="password" id="login-password" placeholder="••••••••">
-      </div>
-      <button class="auth-btn" onclick="handleLogin()">Se connecter →</button>
-      <div class="auth-msg" id="login-msg"></div>
-      <div class="auth-divider">Pas encore inscrit ? <a href="#" onclick="switchAuthTab('signup')" style="color:var(--vert);font-weight:600">Créer un compte</a></div>
-    </div>
-
-    <!-- SIGNUP -->
-    <div class="auth-form" id="form-signup">
-      <div class="auth-group">
-        <label>Email</label>
-        <input type="email" id="signup-email" placeholder="votre@email.fr">
-      </div>
-      <div class="auth-group">
-        <label>Mot de passe</label>
-        <input type="password" id="signup-password" placeholder="Minimum 6 caractères">
-      </div>
-      <div class="auth-group">
-        <label>Confirmer le mot de passe</label>
-        <input type="password" id="signup-password2" placeholder="••••••••">
-      </div>
-      <button class="auth-btn" onclick="handleSignup()">Créer mon compte →</button>
-      <div class="auth-msg" id="signup-msg"></div>
-      <div class="auth-divider">Déjà un compte ? <a href="#" onclick="switchAuthTab('login')" style="color:var(--vert);font-weight:600">Se connecter</a></div>
-    </div>
-  </div>
-</div>
-
-<!-- APP -->
-<div id="app" style="display:none">
-  <header>
-    <div class="header-logo">
-      <span class="icon">🌿</span>
-      <div>
-        <h1>Annuaire de la Couleur Végétale</h1>
-        <p>Carte interactive des acteurs en France</p>
-      </div>
-    </div>
-    <div class="header-right">
-      <span class="user-info" id="user-email-display"></span>
-      <button class="btn-logout" onclick="handleLogout()">Déconnexion</button>
-    </div>
-  </header>
-
-  <nav class="tabs">
-    <div class="tab active" onclick="switchTab('carte', this)">🗺️ Carte & Annuaire</div>
-    <div class="tab" onclick="switchTab('formulaire', this)">✏️ Rejoindre l'annuaire</div>
-    <div class="tab" onclick="switchTab('profil', this)">👤 Mon profil</div>
-  </nav>
-
-  <!-- CARTE -->
-  <div id="panel-carte" class="panel active">
-    <div class="carte-layout">
-      <div id="map"></div>
-      <div class="sidebar">
-        <div class="sidebar-header">
-          <h3>🔍 Rechercher</h3>
-          <input class="search-box" type="text" placeholder="Nom, ville, activité…" oninput="filterActeurs(this.value)">
-          <div class="filter-tags" id="filter-tags"></div>
-        </div>
-        <div class="count-badge" id="count-badge">Chargement…</div>
-        <div class="acteurs-list" id="acteurs-list">
-          <div class="loading"><div class="spinner"></div><br>Chargement de l'annuaire…</div>
-        </div>
-      </div>
-    </div>
+<div class="box">
+  <div class="logo">
+    <span class="icon">🌿</span>
+    <h1>Couleur Végétale</h1>
+    <p>Annuaire des acteurs en France<br>Connectez-vous pour accéder à la carte</p>
   </div>
 
-  <!-- FORMULAIRE -->
-  <div id="panel-formulaire" class="panel">
-    <div class="form-title">
-      <h2>Rejoindre l'annuaire 🌱</h2>
-      <p>Vous travaillez avec les couleurs végétales ? Référencez-vous gratuitement pour être visible par toute la communauté.</p>
-    </div>
-    <div class="form-card">
-      <div class="form-section">
-        <div class="form-section-title">👤 Informations personnelles</div>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Prénom <span class="req">*</span></label>
-            <input type="text" id="f-prenom" placeholder="Marie">
-          </div>
-          <div class="form-group">
-            <label>Nom <span class="req">*</span></label>
-            <input type="text" id="f-nom" placeholder="Dupont">
-          </div>
-          <div class="form-group full">
-            <label>Structure / Atelier / Entreprise</label>
-            <input type="text" id="f-structure" placeholder="Atelier des Teintures Naturelles">
-          </div>
-          <div class="form-group">
-            <label>Email <span class="req">*</span></label>
-            <input type="email" id="f-email" placeholder="marie@exemple.fr">
-          </div>
-          <div class="form-group">
-            <label>Site web</label>
-            <input type="url" id="f-site" placeholder="https://...">
-          </div>
-        </div>
-      </div>
-      <div class="form-section">
-        <div class="form-section-title">📍 Localisation</div>
-        <div class="form-grid">
-          <div class="form-group full">
-            <label>Ville <span class="req">*</span></label>
-            <input type="text" id="f-ville" placeholder="Lyon">
-          </div>
-          <div class="form-group">
-            <label>Département</label>
-            <input type="text" id="f-dept" placeholder="69">
-          </div>
-          <div class="form-group">
-            <label>Région</label>
-            <input type="text" id="f-region" placeholder="Auvergne-Rhône-Alpes">
-          </div>
-        </div>
-      </div>
-      <div class="form-section">
-        <div class="form-section-title">🎨 Activités</div>
-        <div class="checkbox-group" id="activites-group">
-          <label class="checkbox-item"><input type="checkbox" value="Teinture"> Teinture végétale</label>
-          <label class="checkbox-item"><input type="checkbox" value="Formation"> Formation</label>
-          <label class="checkbox-item"><input type="checkbox" value="Jardin"> Jardin tinctorial</label>
-          <label class="checkbox-item"><input type="checkbox" value="Recherche"> Recherche</label>
-          <label class="checkbox-item"><input type="checkbox" value="Créateur"> Création textile</label>
-          <label class="checkbox-item"><input type="checkbox" value="Vente"> Vente de plantes</label>
-          <label class="checkbox-item"><input type="checkbox" value="Artisanat"> Artisanat d'art</label>
-        </div>
-      </div>
-      <div class="form-section">
-        <div class="form-section-title">📝 Présentation</div>
-        <div class="form-group">
-          <label>Décrivez votre activité <span class="req">*</span></label>
-          <textarea id="f-description" placeholder="Parlez de votre pratique, vos spécialités…"></textarea>
-        </div>
-      </div>
-      <button class="btn-submit" id="btn-submit" onclick="submitForm()">🌿 Ajouter ma fiche à l'annuaire</button>
-      <div class="form-msg" id="form-msg"></div>
-    </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('login')">Se connecter</div>
+    <div class="tab" onclick="switchTab('signup')">Créer un compte</div>
   </div>
 
-  <!-- PROFIL -->
-  <div id="panel-profil" class="panel">
-    <h2>👤 Mon profil</h2>
-    <p class="subtitle">Gérez votre fiche dans l'annuaire</p>
-    <div id="profil-content">
-      <div class="loading"><div class="spinner"></div><br>Chargement…</div>
+  <!-- LOGIN -->
+  <div class="form active" id="form-login">
+    <div class="group">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="votre@email.fr">
     </div>
+    <div class="group">
+      <label>Mot de passe</label>
+      <input type="password" id="login-password" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter') handleLogin()">
+    </div>
+    <button class="btn" onclick="handleLogin()">Accéder à l'annuaire →</button>
+    <div class="msg" id="login-msg"></div>
+  </div>
+
+  <!-- SIGNUP -->
+  <div class="form" id="form-signup">
+    <div class="group">
+      <label>Email</label>
+      <input type="email" id="signup-email" placeholder="votre@email.fr">
+    </div>
+    <div class="group">
+      <label>Mot de passe</label>
+      <input type="password" id="signup-password" placeholder="Minimum 6 caractères">
+    </div>
+    <div class="group">
+      <label>Confirmer le mot de passe</label>
+      <input type="password" id="signup-password2" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter') handleSignup()">
+    </div>
+    <button class="btn" onclick="handleSignup()">Créer mon compte →</button>
+    <div class="msg" id="signup-msg"></div>
+  </div>
+
+  <div class="public-link">
+    <p>Vous souhaitez rejoindre l'annuaire ?</p>
+    <a href="/inscription.html">📝 Remplir le formulaire d'inscription →</a>
   </div>
 </div>
 
 <script>
-// ============ CONFIG SUPABASE ============
-const SUPABASE_URL = 'https://dcrzkffhdwznmqokpkla.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjcmt6ZmZoZHd6bm1xb2twa2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwOTA1ODQsImV4cCI6MjA5NjY2NjU4NH0.q3mlZ3tcX1OO4pNOaP70zxZFnxvzBdmKT8EOY5WXfhc';
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+  const SUPABASE_URL = 'https://dcrzkffhdwznmqokpkla.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjcmt6ZmZoZHd6bm1xb2twa2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwOTA1ODQsImV4cCI6MjA5NjY2NjU4NH0.q3mlZ3tcX1OO4pNOaP70zxZFnxvzBdmKT8EOY5WXfhc';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ============ STATE ============
-let map, markers = [], acteurs = [], selectedId = null, activeFilter = 'Tous';
-const categories = ['Tous','Teinture','Formation','Jardin','Recherche','Créateur','Vente','Artisanat'];
-const catColors = { 'Tous':'#4a7c59','Teinture':'#4a7c59','Formation':'#7aad8a','Jardin':'#2d5a3d','Recherche':'#8b5e3c','Créateur':'#c0785a','Vente':'#a05c3c','Artisanat':'#6b7280' };
-
-// ============ AUTH ============
-function switchAuthTab(tab) {
-  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='signup')));
-  document.getElementById('form-login').classList.toggle('active', tab==='login');
-  document.getElementById('form-signup').classList.toggle('active', tab==='signup');
-}
-
-async function handleLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value;
-  const msg = document.getElementById('login-msg');
-  msg.className = 'auth-msg'; msg.textContent = 'Connexion…';
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  if (error) { msg.className = 'auth-msg error'; msg.textContent = 'Email ou mot de passe incorrect.'; }
-}
-
-async function handleSignup() {
-  const email = document.getElementById('signup-email').value.trim();
-  const p1 = document.getElementById('signup-password').value;
-  const p2 = document.getElementById('signup-password2').value;
-  const msg = document.getElementById('signup-msg');
-  if (p1 !== p2) { msg.className = 'auth-msg error'; msg.textContent = 'Les mots de passe ne correspondent pas.'; return; }
-  if (p1.length < 6) { msg.className = 'auth-msg error'; msg.textContent = 'Mot de passe trop court (6 caractères minimum).'; return; }
-  msg.className = 'auth-msg'; msg.textContent = 'Création du compte…';
-  const { error } = await sb.auth.signUp({ email, password: p1 });
-  if (error) { msg.className = 'auth-msg error'; msg.textContent = error.message; }
-  else { msg.className = 'auth-msg success'; msg.textContent = '✅ Compte créé ! Vous êtes connecté.'; }
-}
-
-async function handleLogout() {
-  await sb.auth.signOut();
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('auth-overlay').classList.remove('hidden');
-}
-
-// ============ INIT ============
-sb.auth.onAuthStateChange((event, session) => {
-  if (session) {
-    document.getElementById('auth-overlay').classList.add('hidden');
-    document.getElementById('app').style.display = 'block';
-    document.getElementById('user-email-display').textContent = session.user.email;
-    if (!map) initMap();
-    loadActeurs();
-  } else {
-    document.getElementById('app').style.display = 'none';
-    document.getElementById('auth-overlay').classList.remove('hidden');
-  }
-});
-
-// ============ CARTE ============
-function initMap() {
-  map = L.map('map').setView([46.5, 2.5], 6);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap', maxZoom: 18
-  }).addTo(map);
-  initFilters();
-}
-
-async function loadActeurs() {
-  const { data, error } = await sb.from('acteurs').select('*').order('created_at', { ascending: false });
-  if (error) { console.error(error); return; }
-  acteurs = data || [];
-  renderAll();
-}
-
-function createIcon(couleur) {
-  return L.divIcon({
-    className: '',
-    html: `<div style="width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${couleur};border:3px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><span style="transform:rotate(45deg);font-size:12px;">🌿</span></div>`,
-    iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -36]
+  // Si déjà connecté → rediriger vers l'annuaire
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if (session) window.location.href = '/annuaire.html';
   });
-}
 
-function getFiltered(search = '') {
-  const s = (search || document.querySelector('.search-box')?.value || '').toLowerCase();
-  return acteurs.filter(a => {
-    const matchFilter = activeFilter === 'Tous' || (a.activites && a.activites.includes(activeFilter));
-    const matchSearch = !s || (a.nom||'').toLowerCase().includes(s) || (a.ville||'').toLowerCase().includes(s)
-      || (a.description||'').toLowerCase().includes(s) || (a.structure||'').toLowerCase().includes(s)
-      || (a.prenom||'').toLowerCase().includes(s);
-    return matchFilter && matchSearch;
-  });
-}
-
-function renderAll() {
-  markers.forEach(m => map.removeLayer(m));
-  markers = [];
-  const filtered = getFiltered();
-  filtered.forEach(a => {
-    if (!a.latitude || !a.longitude) return;
-    const couleur = catColors[(a.activites||[])[0]] || '#4a7c59';
-    const m = L.marker([a.latitude, a.longitude], { icon: createIcon(couleur) }).addTo(map);
-    m.bindPopup(`
-      <div style="font-family:'Segoe UI',sans-serif;min-width:190px;padding:4px">
-        <div style="font-weight:800;font-size:0.95rem;color:#2d5a3d;margin-bottom:3px">${a.structure || (a.prenom+' '+a.nom)}</div>
-        <div style="font-size:0.8rem;color:#6b7280;margin-bottom:7px">📍 ${a.ville}${a.region ? ' · '+a.region : ''}</div>
-        <div style="font-size:0.82rem;margin-bottom:8px;line-height:1.5;color:#374151">${(a.description||'').substring(0,120)}${(a.description||'').length>120?'…':''}</div>
-        ${a.site_web ? `<a href="${a.site_web}" target="_blank" style="font-size:0.78rem;color:var(--vert)">🔗 Site web</a>` : ''}
-        <div style="margin-top:6px">${(a.activites||[]).map(ac=>`<span style="background:#eef4f0;color:#4a7c59;padding:2px 7px;border-radius:10px;font-size:0.7rem;font-weight:600;margin-right:3px">${ac}</span>`).join('')}</div>
-      </div>
-    `, { maxWidth: 250 });
-    m.on('click', () => selectActeur(a.id));
-    markers.push({ marker: m, id: a.id });
-  });
-  renderList(filtered);
-}
-
-function renderList(list) {
-  const el = document.getElementById('acteurs-list');
-  document.getElementById('count-badge').textContent = `${list.length} acteur${list.length>1?'s':''} dans l'annuaire`;
-  if (list.length === 0) { el.innerHTML = '<div class="empty-state">Aucun résultat pour cette recherche.</div>'; return; }
-  el.innerHTML = list.map(a => {
-    const couleur = catColors[(a.activites||[])[0]] || '#4a7c59';
-    return `<div class="acteur-card ${selectedId===a.id?'selected':''}" id="card-${a.id}" onclick="selectActeur('${a.id}')" style="border-left-color:${couleur}">
-      <div class="acteur-name">${a.structure || (a.prenom+' '+a.nom)}</div>
-      <div class="acteur-meta">📍 ${a.ville}${a.region?' · '+a.region:''}</div>
-      <div>${(a.activites||[]).map(ac=>`<span class="acteur-tag" style="background:${couleur}20;color:${couleur}">${ac}</span>`).join('')}</div>
-    </div>`;
-  }).join('');
-}
-
-function selectActeur(id) {
-  selectedId = id;
-  const a = acteurs.find(x => x.id === id);
-  if (a && a.latitude && a.longitude) {
-    map.setView([a.latitude, a.longitude], 10, { animate: true });
-    const m = markers.find(x => x.id === id);
-    if (m) m.marker.openPopup();
-  }
-  renderList(getFiltered());
-  document.getElementById('card-'+id)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-function filterActeurs(val) { renderAll(); }
-
-function initFilters() {
-  const wrap = document.getElementById('filter-tags');
-  wrap.innerHTML = categories.map(c => `
-    <span class="filter-tag" id="ft-${c}"
-      style="background:${c==='Tous'?catColors[c]+'20':'#f3f4f6'};color:${c==='Tous'?catColors[c]:'#6b7280'};border-color:${c==='Tous'?catColors[c]:'#e5e7eb'}"
-      onclick="setFilter('${c}')">${c}</span>
-  `).join('');
-}
-
-function setFilter(cat) {
-  activeFilter = cat;
-  categories.forEach(c => {
-    const el = document.getElementById('ft-'+c);
-    if (!el) return;
-    const active = c === cat;
-    el.style.background = active ? catColors[c]+'20' : '#f3f4f6';
-    el.style.color = active ? catColors[c] : '#6b7280';
-    el.style.borderColor = active ? catColors[c] : '#e5e7eb';
-  });
-  renderAll();
-}
-
-// ============ FORMULAIRE ============
-document.querySelectorAll('.checkbox-item').forEach(item => {
-  item.addEventListener('click', () => item.classList.toggle('checked'));
-});
-
-async function geocodeVille(ville) {
-  try {
-    const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(ville+', France')}&format=json&limit=1`);
-    const d = await r.json();
-    if (d.length > 0) return { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) };
-  } catch(e) {}
-  return null;
-}
-
-async function submitForm() {
-  const prenom = document.getElementById('f-prenom').value.trim();
-  const nom = document.getElementById('f-nom').value.trim();
-  const email = document.getElementById('f-email').value.trim();
-  const ville = document.getElementById('f-ville').value.trim();
-  const description = document.getElementById('f-description').value.trim();
-  const msg = document.getElementById('form-msg');
-  const btn = document.getElementById('btn-submit');
-
-  if (!prenom || !nom || !email || !ville || !description) {
-    msg.className = 'form-msg error'; msg.textContent = '⚠️ Merci de remplir tous les champs obligatoires (*)'; return;
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach((t, i) =>
+      t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='signup')));
+    document.getElementById('form-login').classList.toggle('active', tab==='login');
+    document.getElementById('form-signup').classList.toggle('active', tab==='signup');
   }
 
-  btn.disabled = true; btn.textContent = '⏳ Enregistrement…';
-  msg.className = 'form-msg'; msg.style.display = 'none';
-
-  const activites = [...document.querySelectorAll('.checkbox-item.checked')].map(el => el.querySelector('input').value);
-  const coords = await geocodeVille(ville);
-  const { data: { user } } = await sb.auth.getUser();
-
-  const { error } = await sb.from('acteurs').insert([{
-    user_id: user?.id || null,
-    prenom, nom,
-    structure: document.getElementById('f-structure').value || null,
-    email,
-    site_web: document.getElementById('f-site').value || null,
-    ville,
-    departement: document.getElementById('f-dept').value || null,
-    region: document.getElementById('f-region').value || null,
-    latitude: coords?.lat || null,
-    longitude: coords?.lng || null,
-    activites: activites.length ? activites : null,
-    description,
-    approuve: true
-  }]);
-
-  btn.disabled = false; btn.textContent = '🌿 Ajouter ma fiche à l\'annuaire';
-
-  if (error) {
-    msg.className = 'form-msg error'; msg.textContent = '❌ Une erreur est survenue. Veuillez réessayer.';
-  } else {
-    msg.className = 'form-msg success';
-    msg.textContent = '✅ Votre fiche a été ajoutée à l\'annuaire ! Elle est maintenant visible sur la carte.';
-    document.getElementById('f-prenom').value = '';
-    document.getElementById('f-nom').value = '';
-    document.getElementById('f-email').value = '';
-    document.getElementById('f-ville').value = '';
-    document.getElementById('f-description').value = '';
-    document.getElementById('f-structure').value = '';
-    document.getElementById('f-site').value = '';
-    document.getElementById('f-dept').value = '';
-    document.getElementById('f-region').value = '';
-    document.querySelectorAll('.checkbox-item').forEach(i => i.classList.remove('checked'));
-    loadActeurs();
+  async function handleLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const msg = document.getElementById('login-msg');
+    msg.className = 'msg'; msg.textContent = 'Connexion…';
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) {
+      msg.className = 'msg error'; msg.textContent = '❌ Email ou mot de passe incorrect.';
+    } else {
+      msg.className = 'msg success'; msg.textContent = '✅ Connexion réussie !';
+      setTimeout(() => window.location.href = '/annuaire.html', 800);
+    }
   }
-}
 
-// ============ TABS ============
-function switchTab(tab, el) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('panel-'+tab).classList.add('active');
-  if (el) el.classList.add('active');
-  if (tab === 'carte') setTimeout(() => map && map.invalidateSize(), 100);
-  if (tab === 'profil') loadProfil();
-}
-
-// ============ PROFIL ============
-async function loadProfil() {
-  const { data: { user } } = await sb.auth.getUser();
-  if (!user) return;
-  const { data } = await sb.from('acteurs').select('*').eq('user_id', user.id).single();
-  const el = document.getElementById('profil-content');
-  if (!data) {
-    el.innerHTML = `<div class="form-card" style="padding:28px;text-align:center;color:var(--gris)">
-      <div style="font-size:2rem;margin-bottom:12px">🌱</div>
-      <p style="font-weight:600;margin-bottom:8px">Vous n'avez pas encore de fiche dans l'annuaire.</p>
-      <p style="font-size:0.85rem">Rendez-vous dans l'onglet <strong>"Rejoindre l'annuaire"</strong> pour créer votre fiche.</p>
-    </div>`;
-  } else {
-    el.innerHTML = `<div class="form-card" style="padding:28px">
-      <div style="font-size:1.1rem;font-weight:800;color:var(--vert);margin-bottom:4px">${data.structure || data.prenom+' '+data.nom}</div>
-      <div style="font-size:0.85rem;color:var(--gris);margin-bottom:16px">📍 ${data.ville}${data.region?' · '+data.region:''}</div>
-      <div style="font-size:0.88rem;line-height:1.6;margin-bottom:16px">${data.description}</div>
-      <div style="margin-bottom:16px">${(data.activites||[]).map(a=>`<span style="background:var(--vert-pale);color:var(--vert);padding:3px 10px;border-radius:10px;font-size:0.78rem;font-weight:600;margin-right:6px">${a}</span>`).join('')}</div>
-      <div style="font-size:0.8rem;color:var(--gris)">📧 ${data.email}${data.site_web?` · <a href="${data.site_web}" target="_blank" style="color:var(--vert)">Site web</a>`:''}</div>
-      <div style="margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;font-size:0.8rem;color:var(--gris)">
-        Pour modifier votre fiche, contactez l'administrateur de l'annuaire.
-      </div>
-    </div>`;
+  async function handleSignup() {
+    const email = document.getElementById('signup-email').value.trim();
+    const p1 = document.getElementById('signup-password').value;
+    const p2 = document.getElementById('signup-password2').value;
+    const msg = document.getElementById('signup-msg');
+    if (p1 !== p2) { msg.className = 'msg error'; msg.textContent = '❌ Les mots de passe ne correspondent pas.'; return; }
+    if (p1.length < 6) { msg.className = 'msg error'; msg.textContent = '❌ Mot de passe trop court (6 caractères minimum).'; return; }
+    msg.className = 'msg'; msg.textContent = 'Création du compte…';
+    const { error } = await sb.auth.signUp({ email, password: p1 });
+    if (error) { msg.className = 'msg error'; msg.textContent = '❌ ' + error.message; }
+    else {
+      msg.className = 'msg success'; msg.textContent = '✅ Compte créé ! Redirection…';
+      setTimeout(() => window.location.href = '/annuaire.html', 1000);
+    }
   }
-}
 </script>
 </body>
 </html>

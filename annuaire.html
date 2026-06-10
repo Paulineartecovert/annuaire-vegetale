@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Annuaire de la Couleur Végétale</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --vert: #4a7c59; --vert-clair: #7aad8a; --vert-pale: #eef4f0; --beige: #f5f0e8; --gris: #6b7280; --ombre: 0 4px 20px rgba(0,0,0,0.08); }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--beige); color: #2d2d2d; min-height: 100vh; }
+
+  header {
+    background: linear-gradient(135deg, var(--vert) 0%, #2d5a3d 100%);
+    color: white; padding: 16px 28px; display: flex; align-items: center;
+    justify-content: space-between; box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+  .header-logo { display: flex; align-items: center; gap: 10px; }
+  .header-logo .icon { font-size: 26px; }
+  header h1 { font-size: 1.1rem; font-weight: 700; }
+  header p { font-size: 0.76rem; opacity: 0.8; margin-top: 1px; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .user-info { font-size: 0.8rem; opacity: 0.85; }
+  .btn-logout {
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.78rem;
+    font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none;
+  }
+  .btn-logout:hover { background: rgba(255,255,255,0.25); }
+
+  .tabs { display: flex; background: white; border-bottom: 1px solid #e5e7eb; padding: 0 28px; box-shadow: var(--ombre); }
+  .tab {
+    padding: 14px 20px; cursor: pointer; font-size: 0.87rem; font-weight: 500;
+    color: var(--gris); border-bottom: 3px solid transparent; transition: all 0.2s;
+  }
+  .tab:hover { color: var(--vert); }
+  .tab.active { color: var(--vert); border-bottom-color: var(--vert); font-weight: 600; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+  #panel-carte.active { display: flex; flex-direction: column; }
+
+  /* CARTE */
+  .carte-layout { display: flex; height: calc(100vh - 116px); }
+  #map { flex: 1; z-index: 1; }
+  .sidebar { width: 310px; background: white; overflow-y: auto; border-left: 1px solid #e5e7eb; display: flex; flex-direction: column; }
+  .sidebar-header { padding: 16px; border-bottom: 1px solid #e5e7eb; background: var(--vert-pale); }
+  .sidebar-header h3 { font-size: 0.88rem; font-weight: 700; color: var(--vert); margin-bottom: 8px; }
+  .search-box { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.84rem; outline: none; }
+  .search-box:focus { border-color: var(--vert); }
+  .filter-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .filter-tag { padding: 3px 9px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: 1.5px solid transparent; transition: all 0.2s; }
+  .count-badge { font-size: 0.78rem; font-weight: 600; color: var(--gris); padding: 7px 16px; background: var(--vert-pale); border-bottom: 1px solid #e5e7eb; text-align: center; }
+  .acteurs-list { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 7px; }
+  .acteur-card { background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; cursor: pointer; transition: all 0.2s; border-left: 4px solid var(--vert); }
+  .acteur-card:hover { box-shadow: 0 4px 12px rgba(74,124,89,0.15); transform: translateY(-1px); }
+  .acteur-card.selected { background: var(--vert-pale); }
+  .acteur-name { font-weight: 700; font-size: 0.87rem; margin-bottom: 3px; }
+  .acteur-meta { font-size: 0.74rem; color: var(--gris); margin-bottom: 5px; }
+  .acteur-tag { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 0.68rem; font-weight: 600; margin-right: 3px; }
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--gris); font-size: 0.85rem; }
+  .loading { text-align: center; padding: 40px 20px; color: var(--gris); }
+  .spinner { display: inline-block; width: 28px; height: 28px; border: 3px solid #e5e7eb; border-top-color: var(--vert); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 10px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* PROFIL */
+  #panel-profil { padding: 36px 28px; max-width: 680px; margin: 0 auto; }
+  #panel-profil h2 { font-size: 1.3rem; font-weight: 800; color: var(--vert); margin-bottom: 6px; }
+  #panel-profil .subtitle { color: var(--gris); font-size: 0.88rem; margin-bottom: 24px; }
+  .profil-card { background: white; border-radius: 14px; padding: 26px; box-shadow: var(--ombre); }
+
+  @media (max-width: 768px) {
+    .carte-layout { flex-direction: column; height: auto; }
+    #map { height: 50vh; }
+    .sidebar { width: 100%; height: 45vh; }
+    header { padding: 12px 16px; }
+    .tabs { padding: 0 10px; overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-logo">
+    <span class="icon">🌿</span>
+    <div>
+      <h1>Annuaire de la Couleur Végétale</h1>
+      <p>Carte interactive des acteurs en France</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="user-info" id="user-email"></span>
+    <button class="btn-logout" onclick="handleLogout()">Déconnexion</button>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="tab active" onclick="switchTab('carte', this)">🗺️ Carte & Annuaire</div>
+  <div class="tab" onclick="switchTab('profil', this)">👤 Mon profil</div>
+</nav>
+
+<!-- CARTE -->
+<div id="panel-carte" class="panel active">
+  <div class="carte-layout">
+    <div id="map"></div>
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h3>🔍 Rechercher</h3>
+        <input class="search-box" type="text" placeholder="Nom, ville, activité…" oninput="filterActeurs(this.value)">
+        <div class="filter-tags" id="filter-tags"></div>
+      </div>
+      <div class="count-badge" id="count-badge">Chargement…</div>
+      <div class="acteurs-list" id="acteurs-list">
+        <div class="loading"><div class="spinner"></div><br>Chargement de l'annuaire…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFIL -->
+<div id="panel-profil" class="panel">
+  <h2>👤 Mon profil</h2>
+  <p class="subtitle">Votre fiche dans l'annuaire</p>
+  <div id="profil-content">
+    <div class="loading"><div class="spinner"></div><br>Chargement…</div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://dcrzkffhdwznmqokpkla.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjcmt6ZmZoZHd6bm1xb2twa2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwOTA1ODQsImV4cCI6MjA5NjY2NjU4NH0.q3mlZ3tcX1OO4pNOaP70zxZFnxvzBdmKT8EOY5WXfhc';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let map, markers = [], acteurs = [], selectedId = null, activeFilter = 'Tous';
+  const categories = ['Tous','Teinture','Formation','Jardin','Recherche','Créateur','Vente','Artisanat'];
+  const catColors = { 'Tous':'#4a7c59','Teinture':'#4a7c59','Formation':'#7aad8a','Jardin':'#2d5a3d','Recherche':'#8b5e3c','Créateur':'#c0785a','Vente':'#a05c3c','Artisanat':'#6b7280' };
+
+  // Vérifier la session
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if (!session) { window.location.href = '/index.html'; return; }
+    document.getElementById('user-email').textContent = session.user.email;
+    initMap();
+    loadActeurs();
+  });
+
+  async function handleLogout() {
+    await sb.auth.signOut();
+    window.location.href = '/index.html';
+  }
+
+  function initMap() {
+    map = L.map('map').setView([46.5, 2.5], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap', maxZoom: 18
+    }).addTo(map);
+    initFilters();
+  }
+
+  async function loadActeurs() {
+    const { data, error } = await sb.from('acteurs').select('*').order('created_at', { ascending: false });
+    if (error) { console.error(error); return; }
+    acteurs = data || [];
+    renderAll();
+  }
+
+  function createIcon(couleur) {
+    return L.divIcon({
+      className: '',
+      html: `<div style="width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${couleur};border:3px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><span style="transform:rotate(45deg);font-size:11px;">🌿</span></div>`,
+      iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -34]
+    });
+  }
+
+  function getFiltered() {
+    const s = (document.querySelector('.search-box')?.value || '').toLowerCase();
+    return acteurs.filter(a => {
+      const matchFilter = activeFilter === 'Tous' || (a.activites && a.activites.includes(activeFilter));
+      const matchSearch = !s || (a.nom||'').toLowerCase().includes(s) || (a.ville||'').toLowerCase().includes(s)
+        || (a.description||'').toLowerCase().includes(s) || (a.structure||'').toLowerCase().includes(s)
+        || (a.prenom||'').toLowerCase().includes(s);
+      return matchFilter && matchSearch;
+    });
+  }
+
+  function renderAll() {
+    markers.forEach(m => map.removeLayer(m.marker));
+    markers = [];
+    const filtered = getFiltered();
+    filtered.forEach(a => {
+      if (!a.latitude || !a.longitude) return;
+      const couleur = catColors[(a.activites||[])[0]] || '#4a7c59';
+      const m = L.marker([a.latitude, a.longitude], { icon: createIcon(couleur) }).addTo(map);
+      m.bindPopup(`
+        <div style="font-family:'Segoe UI',sans-serif;min-width:185px;padding:4px">
+          <div style="font-weight:800;font-size:0.92rem;color:#2d5a3d;margin-bottom:3px">${a.structure||(a.prenom+' '+a.nom)}</div>
+          <div style="font-size:0.78rem;color:#6b7280;margin-bottom:6px">📍 ${a.ville}${a.region?' · '+a.region:''}</div>
+          <div style="font-size:0.8rem;margin-bottom:7px;line-height:1.5;color:#374151">${(a.description||'').substring(0,110)}${(a.description||'').length>110?'…':''}</div>
+          ${a.site_web?`<a href="${a.site_web}" target="_blank" style="font-size:0.76rem;color:#4a7c59">🔗 Site web</a>`:''}
+          <div style="margin-top:5px">${(a.activites||[]).map(ac=>`<span style="background:#eef4f0;color:#4a7c59;padding:2px 6px;border-radius:8px;font-size:0.68rem;font-weight:600;margin-right:2px">${ac}</span>`).join('')}</div>
+        </div>
+      `, { maxWidth: 240 });
+      m.on('click', () => selectActeur(a.id));
+      markers.push({ marker: m, id: a.id });
+    });
+    renderList(filtered);
+  }
+
+  function renderList(list) {
+    const el = document.getElementById('acteurs-list');
+    document.getElementById('count-badge').textContent = `${list.length} acteur${list.length>1?'s':''} dans l'annuaire`;
+    if (list.length === 0) { el.innerHTML = '<div class="empty-state">Aucun résultat.</div>'; return; }
+    el.innerHTML = list.map(a => {
+      const couleur = catColors[(a.activites||[])[0]] || '#4a7c59';
+      return `<div class="acteur-card ${selectedId===a.id?'selected':''}" id="card-${a.id}" onclick="selectActeur('${a.id}')" style="border-left-color:${couleur}">
+        <div class="acteur-name">${a.structure||(a.prenom+' '+a.nom)}</div>
+        <div class="acteur-meta">📍 ${a.ville}${a.region?' · '+a.region:''}</div>
+        <div>${(a.activites||[]).map(ac=>`<span class="acteur-tag" style="background:${couleur}20;color:${couleur}">${ac}</span>`).join('')}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function selectActeur(id) {
+    selectedId = id;
+    const a = acteurs.find(x => x.id === id);
+    if (a?.latitude && a?.longitude) {
+      map.setView([a.latitude, a.longitude], 10, { animate: true });
+      const m = markers.find(x => x.id === id);
+      if (m) m.marker.openPopup();
+    }
+    renderList(getFiltered());
+    document.getElementById('card-'+id)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function filterActeurs() { renderAll(); }
+
+  function initFilters() {
+    document.getElementById('filter-tags').innerHTML = categories.map(c =>
+      `<span class="filter-tag" id="ft-${c}"
+        style="background:${c==='Tous'?catColors[c]+'20':'#f3f4f6'};color:${c==='Tous'?catColors[c]:'#6b7280'};border-color:${c==='Tous'?catColors[c]:'#e5e7eb'}"
+        onclick="setFilter('${c}')">${c}</span>`
+    ).join('');
+  }
+
+  function setFilter(cat) {
+    activeFilter = cat;
+    categories.forEach(c => {
+      const el = document.getElementById('ft-'+c);
+      if (!el) return;
+      const active = c === cat;
+      el.style.background = active ? catColors[c]+'20' : '#f3f4f6';
+      el.style.color = active ? catColors[c] : '#6b7280';
+      el.style.borderColor = active ? catColors[c] : '#e5e7eb';
+    });
+    renderAll();
+  }
+
+  function switchTab(tab, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-'+tab).classList.add('active');
+    if (el) el.classList.add('active');
+    if (tab === 'carte') setTimeout(() => map && map.invalidateSize(), 100);
+    if (tab === 'profil') loadProfil();
+  }
+
+  async function loadProfil() {
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) return;
+    const { data } = await sb.from('acteurs').select('*').eq('user_id', user.id).single();
+    const el = document.getElementById('profil-content');
+    if (!data) {
+      el.innerHTML = `<div class="profil-card" style="text-align:center;color:var(--gris);padding:40px">
+        <div style="font-size:2rem;margin-bottom:12px">🌱</div>
+        <p style="font-weight:600;margin-bottom:8px">Vous n'avez pas encore de fiche dans l'annuaire.</p>
+        <a href="/inscription.html" style="color:var(--vert);font-weight:600;font-size:0.9rem">→ Créer ma fiche</a>
+      </div>`;
+    } else {
+      el.innerHTML = `<div class="profil-card">
+        <div style="font-size:1.1rem;font-weight:800;color:var(--vert);margin-bottom:4px">${data.structure||(data.prenom+' '+data.nom)}</div>
+        <div style="font-size:0.83rem;color:var(--gris);margin-bottom:14px">📍 ${data.ville}${data.region?' · '+data.region:''}</div>
+        <div style="font-size:0.88rem;line-height:1.6;margin-bottom:14px">${data.description}</div>
+        <div style="margin-bottom:14px">${(data.activites||[]).map(a=>`<span style="background:var(--vert-pale);color:var(--vert);padding:3px 10px;border-radius:10px;font-size:0.76rem;font-weight:600;margin-right:5px">${a}</span>`).join('')}</div>
+        <div style="font-size:0.8rem;color:var(--gris);padding-top:14px;border-top:1px solid #e5e7eb">
+          📧 ${data.email}${data.site_web?` · <a href="${data.site_web}" target="_blank" style="color:var(--vert)">Site web</a>`:''}
+        </div>
+      </div>`;
+    }
+  }
+</script>
+</body>
+</html>

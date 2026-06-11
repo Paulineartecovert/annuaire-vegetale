@@ -248,8 +248,16 @@
         msg.className = 'form-msg error';
         msg.textContent = '❌ Erreur lors de l\'ajout de votre fiche : ' + dbError.message;
       } else {
-        document.getElementById('form-wrap').style.display = 'none';
-        document.getElementById('success-card').classList.add('show');
+        // Connecter directement et rediriger vers l'annuaire
+        const { error: loginError } = await sb.auth.signInWithPassword({ email, password });
+        if (loginError) {
+          // Si connexion auto échoue → page de succès avec lien
+          document.getElementById('form-wrap').style.display = 'none';
+          document.getElementById('success-card').classList.add('show');
+        } else {
+          // Redirection directe vers l'annuaire 🎉
+          window.location.href = '/annuaire.html';
+        }
       }
 
     } catch(e) {

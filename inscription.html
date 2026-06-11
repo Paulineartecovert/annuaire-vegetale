@@ -189,29 +189,16 @@
     msg.style.display = 'none';
 
     try {
-      // 1. Créer le compte utilisateur
-      const { data: authData, error: authError } = await sb.auth.signUp({ email, password });
-
-      if (authError) {
-        btn.disabled = false;
-        btn.textContent = '🌿 Rejoindre l\'annuaire';
-        msg.className = 'form-msg error';
-        msg.textContent = authError.message.includes('already registered')
-          ? '❌ Cet email est déjà inscrit. Connectez-vous sur la page d\'accueil.'
-          : '❌ Erreur : ' + authError.message;
-        return;
-      }
-
-      // 2. Récupérer les activités sélectionnées
+      // 1. Récupérer les activités sélectionnées
       const activites = [];
       document.querySelectorAll('.checkbox-item.checked').forEach(el => {
         activites.push(el.getAttribute('data-value'));
       });
 
-      // 3. Géocoder la ville
+      // 2. Géocoder la ville
       const coords = await geocodeVille(ville);
 
-      // 4. Insérer la fiche dans l'annuaire
+      // 3. Insérer la fiche SANS user_id (RLS désactivé)
       const ficheData = {
         prenom: prenom,
         nom: nom,
@@ -225,39 +212,42 @@
         longitude: coords ? coords.lng : null,
         activites: activites.length > 0 ? activites : null,
         description: description,
-        approuve: true,
-        user_id: null
+        approuve: true
       };
 
-      // Créer un client séparé avec la session pour l'insertion
-      const sbInsert = createClient(SUPABASE_URL, SUPABASE_KEY);
-      if (authData && authData.session) {
-        await sbInsert.auth.setSession(authData.session);
-        if (authData.user && authData.user.id) {
-          ficheData.user_id = authData.user.id;
-        }
+      const { error: dbError } = await sb.from('acteurs').insert([ficheData]);
+
+      if (dbError) {
+        console.error('DB Error:', dbError);
+        btn.disabled = false;
+        btn.textContent = '🌿 Rejoindre l\'annuaire';
+        msg.className = 'form-msg error';
+        msg.textContent = '❌ Erreur lors de l\'ajout de votre fiche : ' + dbError.message;
+        return;
       }
 
-      const { error: dbError } = await sbInsert.from('acteurs').insert([ficheData]);
+      // 4. Créer le compte utilisateur
+      const { error: authError } = await sb.auth.signUp({ email, password });
+
+      if (authError && !authError.message.includes('already registered')) {
+        btn.disabled = false;
+        btn.textContent = '🌿 Rejoindre l\'annuaire';
+        msg.className = 'form-msg error';
+        msg.textContent = '❌ Fiche enregistrée mais erreur compte : ' + authError.message;
+        return;
+      }
+
+      // 5. Connecter et rediriger
+      const { error: loginError } = await sb.auth.signInWithPassword({ email, password });
 
       btn.disabled = false;
       btn.textContent = '🌿 Rejoindre l\'annuaire';
 
-      if (dbError) {
-        console.error('DB Error:', dbError);
-        msg.className = 'form-msg error';
-        msg.textContent = '❌ Erreur lors de l\'ajout de votre fiche : ' + dbError.message;
+      if (loginError) {
+        document.getElementById('form-wrap').style.display = 'none';
+        document.getElementById('success-card').classList.add('show');
       } else {
-        // Connecter directement et rediriger vers l'annuaire
-        const { error: loginError } = await sb.auth.signInWithPassword({ email, password });
-        if (loginError) {
-          // Si connexion auto échoue → page de succès avec lien
-          document.getElementById('form-wrap').style.display = 'none';
-          document.getElementById('success-card').classList.add('show');
-        } else {
-          // Redirection directe vers l'annuaire 🎉
-          window.location.href = '/annuaire.html';
-        }
+        window.location.href = '/annuaire.html';
       }
 
     } catch(e) {

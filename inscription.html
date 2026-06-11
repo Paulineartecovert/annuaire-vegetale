@@ -225,15 +225,20 @@
         longitude: coords ? coords.lng : null,
         activites: activites.length > 0 ? activites : null,
         description: description,
-        approuve: true
+        approuve: true,
+        user_id: null
       };
 
-      // Ajouter user_id seulement si on l'a
-      if (authData && authData.user && authData.user.id) {
-        ficheData.user_id = authData.user.id;
+      // Créer un client séparé avec la session pour l'insertion
+      const sbInsert = createClient(SUPABASE_URL, SUPABASE_KEY);
+      if (authData && authData.session) {
+        await sbInsert.auth.setSession(authData.session);
+        if (authData.user && authData.user.id) {
+          ficheData.user_id = authData.user.id;
+        }
       }
 
-      const { error: dbError } = await sb.from('acteurs').insert([ficheData]);
+      const { error: dbError } = await sbInsert.from('acteurs').insert([ficheData]);
 
       btn.disabled = false;
       btn.textContent = '🌿 Rejoindre l\'annuaire';

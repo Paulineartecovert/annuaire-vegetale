@@ -22,15 +22,13 @@
   .logo .icon { font-size: 52px; display: block; margin-bottom: 14px; }
   .logo h1 { font-size: 1.5rem; font-weight: 800; color: var(--vert); }
   .logo p { font-size: 0.88rem; color: var(--gris); margin-top: 6px; line-height: 1.5; }
-  .tabs { display: flex; border-bottom: 2px solid #e5e7eb; margin-bottom: 26px; }
-  .tab {
-    flex: 1; padding: 12px; text-align: center; cursor: pointer;
-    font-size: 0.9rem; font-weight: 600; color: var(--gris);
-    border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s;
+
+  .section-title {
+    font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--vert); margin-bottom: 20px;
+    padding-bottom: 10px; border-bottom: 2px solid var(--vert-pale);
   }
-  .tab.active { color: var(--vert); border-bottom-color: var(--vert); }
-  .form { display: none; }
-  .form.active { display: block; }
+
   .group { margin-bottom: 18px; }
   .group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
   .group input {
@@ -38,27 +36,56 @@
     border-radius: 10px; font-size: 0.92rem; outline: none; transition: border 0.2s;
   }
   .group input:focus { border-color: var(--vert); box-shadow: 0 0 0 3px rgba(74,124,89,0.1); }
+
+  .forgot {
+    display: block; text-align: right; font-size: 0.78rem;
+    color: var(--gris); margin-top: -10px; margin-bottom: 18px;
+    text-decoration: none; cursor: pointer;
+  }
+  .forgot:hover { color: var(--vert); }
+
   .btn {
     width: 100%; padding: 14px; background: linear-gradient(135deg, var(--vert), #2d5a3d);
     color: white; border: none; border-radius: 10px; font-size: 1rem;
     font-weight: 700; cursor: pointer; transition: all 0.2s;
   }
   .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(74,124,89,0.35); }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
   .msg { font-size: 0.83rem; text-align: center; margin-top: 12px; min-height: 20px; padding: 8px; border-radius: 8px; }
   .msg.error { background: #fef2f2; color: #dc2626; }
   .msg.success { background: var(--vert-pale); color: var(--vert); }
-  .divider { text-align: center; margin-top: 20px; font-size: 0.82rem; color: var(--gris); }
-  .divider a { color: var(--vert); font-weight: 600; text-decoration: none; }
-  .public-link {
-    margin-top: 24px; padding: 16px; background: var(--vert-pale);
-    border-radius: 12px; text-align: center;
+  .msg.info { background: #eff6ff; color: #1d4ed8; }
+
+  .reset-form { display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb; }
+  .reset-form.show { display: block; }
+  .reset-form label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
+  .reset-form input {
+    width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb;
+    border-radius: 10px; font-size: 0.9rem; outline: none; margin-bottom: 12px;
   }
-  .public-link p { font-size: 0.82rem; color: var(--gris); margin-bottom: 8px; }
-  .public-link a {
+  .reset-form input:focus { border-color: var(--vert); }
+  .btn-reset {
+    width: 100%; padding: 12px; background: var(--vert-pale);
+    color: var(--vert); border: 1.5px solid var(--vert-clair);
+    border-radius: 10px; font-size: 0.9rem; font-weight: 700; cursor: pointer;
+  }
+  .btn-reset:hover { background: #d4ead9; }
+
+  .divider { margin: 24px 0; border: none; border-top: 1px solid #e5e7eb; }
+
+  .inscription-block {
+    background: var(--vert-pale); border-radius: 12px;
+    padding: 18px 20px; text-align: center;
+  }
+  .inscription-block p {
+    font-size: 0.82rem; color: var(--gris); margin-bottom: 10px; line-height: 1.5;
+  }
+  .inscription-block a {
     display: inline-block; color: var(--vert); font-weight: 700;
     font-size: 0.88rem; text-decoration: none;
   }
-  .public-link a:hover { text-decoration: underline; }
+  .inscription-block a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -69,53 +96,41 @@
     <p>Annuaire des acteurs en France<br>Connectez-vous pour accéder à la carte</p>
   </div>
 
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('login')">Se connecter</div>
-    <div class="tab" onclick="switchTab('signup')">Créer un compte</div>
+  <div class="section-title">🔐 Connexion à l'annuaire</div>
+
+  <div class="group">
+    <label>Email</label>
+    <input type="email" id="login-email" placeholder="votre@email.fr">
+  </div>
+  <div class="group">
+    <label>Mot de passe</label>
+    <input type="password" id="login-password" placeholder="••••••••"
+      onkeydown="if(event.key==='Enter') handleLogin()">
   </div>
 
-  <!-- LOGIN -->
-  <div class="form active" id="form-login">
-    <div class="group">
-      <label>Email</label>
-      <input type="email" id="login-email" placeholder="votre@email.fr">
-    </div>
-    <div class="group">
-      <label>Mot de passe</label>
-      <input type="password" id="login-password" placeholder="••••••••"
-        onkeydown="if(event.key==='Enter') handleLogin()">
-    </div>
-    <button class="btn" onclick="handleLogin()">Accéder à l'annuaire →</button>
-    <div class="msg" id="login-msg"></div>
+  <span class="forgot" onclick="toggleReset()">Mot de passe oublié ?</span>
+
+  <button class="btn" id="btn-login" onclick="handleLogin()">Accéder à l'annuaire →</button>
+  <div class="msg" id="login-msg"></div>
+
+  <!-- Réinitialisation mot de passe -->
+  <div class="reset-form" id="reset-form">
+    <label>Votre email</label>
+    <input type="email" id="reset-email" placeholder="votre@email.fr">
+    <button class="btn-reset" onclick="handleReset()">Recevoir le lien de réinitialisation</button>
+    <div class="msg" id="reset-msg"></div>
   </div>
 
-  <!-- SIGNUP -->
-  <div class="form" id="form-signup">
-    <div class="group">
-      <label>Email</label>
-      <input type="email" id="signup-email" placeholder="votre@email.fr">
-    </div>
-    <div class="group">
-      <label>Mot de passe</label>
-      <input type="password" id="signup-password" placeholder="Minimum 6 caractères">
-    </div>
-    <div class="group">
-      <label>Confirmer le mot de passe</label>
-      <input type="password" id="signup-password2" placeholder="••••••••"
-        onkeydown="if(event.key==='Enter') handleSignup()">
-    </div>
-    <button class="btn" onclick="handleSignup()">Créer mon compte →</button>
-    <div class="msg" id="signup-msg"></div>
-  </div>
+  <hr class="divider">
 
-  <div class="public-link">
-    <p>Vous souhaitez rejoindre l'annuaire ?</p>
+  <div class="inscription-block">
+    <p>Vous souhaitez apparaître sur la carte ?</p>
     <a href="/inscription.html">📝 Remplir le formulaire d'inscription →</a>
   </div>
 </div>
 
 <script>
-  const SUPABASE_URL = 'https://dcrkzffhdwznmqokpkla.supabase.co';
+  const SUPABASE_URL = 'https://dcrzkffhdwznmqokpkla.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjcmt6ZmZoZHd6bm1xb2twa2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwOTA1ODQsImV4cCI6MjA5NjY2NjU4NH0.q3mlZ3tcX1OO4pNOaP70zxZFnxvzBdmKT8EOY5WXfhc';
   const { createClient } = supabase;
   const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -125,40 +140,51 @@
     if (session) window.location.href = '/annuaire.html';
   });
 
-  function switchTab(tab) {
-    document.querySelectorAll('.tab').forEach((t, i) =>
-      t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='signup')));
-    document.getElementById('form-login').classList.toggle('active', tab==='login');
-    document.getElementById('form-signup').classList.toggle('active', tab==='signup');
-  }
-
   async function handleLogin() {
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     const msg = document.getElementById('login-msg');
-    msg.className = 'msg'; msg.textContent = 'Connexion…';
+    const btn = document.getElementById('btn-login');
+
+    if (!email || !password) {
+      msg.className = 'msg error'; msg.textContent = '⚠️ Merci de remplir email et mot de passe.'; return;
+    }
+
+    btn.disabled = true; btn.textContent = 'Connexion…';
+    msg.className = 'msg'; msg.textContent = '';
+
     const { error } = await sb.auth.signInWithPassword({ email, password });
+    btn.disabled = false; btn.textContent = 'Accéder à l\'annuaire →';
+
     if (error) {
-      msg.className = 'msg error'; msg.textContent = '❌ Email ou mot de passe incorrect.';
+      msg.className = 'msg error';
+      msg.textContent = '❌ Email ou mot de passe incorrect.';
     } else {
       msg.className = 'msg success'; msg.textContent = '✅ Connexion réussie !';
       setTimeout(() => window.location.href = '/annuaire.html', 800);
     }
   }
 
-  async function handleSignup() {
-    const email = document.getElementById('signup-email').value.trim();
-    const p1 = document.getElementById('signup-password').value;
-    const p2 = document.getElementById('signup-password2').value;
-    const msg = document.getElementById('signup-msg');
-    if (p1 !== p2) { msg.className = 'msg error'; msg.textContent = '❌ Les mots de passe ne correspondent pas.'; return; }
-    if (p1.length < 6) { msg.className = 'msg error'; msg.textContent = '❌ Mot de passe trop court (6 caractères minimum).'; return; }
-    msg.className = 'msg'; msg.textContent = 'Création du compte…';
-    const { error } = await sb.auth.signUp({ email, password: p1 });
-    if (error) { msg.className = 'msg error'; msg.textContent = '❌ ' + error.message; }
-    else {
-      msg.className = 'msg success'; msg.textContent = '✅ Compte créé ! Redirection…';
-      setTimeout(() => window.location.href = '/annuaire.html', 1000);
+  function toggleReset() {
+    const f = document.getElementById('reset-form');
+    f.classList.toggle('show');
+    if (f.classList.contains('show')) {
+      document.getElementById('reset-email').value = document.getElementById('login-email').value;
+    }
+  }
+
+  async function handleReset() {
+    const email = document.getElementById('reset-email').value.trim();
+    const msg = document.getElementById('reset-msg');
+    if (!email) { msg.className = 'msg error'; msg.textContent = '⚠️ Entrez votre email.'; return; }
+    msg.className = 'msg'; msg.textContent = 'Envoi…';
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/index.html'
+    });
+    if (error) {
+      msg.className = 'msg error'; msg.textContent = '❌ Erreur : ' + error.message;
+    } else {
+      msg.className = 'msg success'; msg.textContent = '✅ Email envoyé ! Vérifiez votre boîte mail.';
     }
   }
 </script>

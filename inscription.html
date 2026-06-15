@@ -216,7 +216,7 @@
 
     // Géocoder la ville
     const coords = await geocodeVille(ville);
-    const activites = [...document.querySelectorAll('.checkbox-item.checked')].map(el => el.querySelector('input').value);
+    const activites = [...document.querySelectorAll('.checkbox-item input[type="checkbox"]:checked')].map(el => el.value);
 
     // Insertion via fetch REST direct (contourne les blocages du client JS)
     const payload = {

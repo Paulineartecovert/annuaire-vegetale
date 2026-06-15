@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inscription confirmée – Couleur Végétale</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --vert: #4a7c59; --vert-fonce: #2d5a3d; --vert-clair: #7aad8a;
+    --vert-pale: #eef4f0; --beige: #f5f0e8; --gris: #6b7280;
+  }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--beige);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    background: linear-gradient(135deg, var(--vert) 0%, var(--vert-fonce) 100%);
+    color: white; padding: 18px 32px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+  header .icon { font-size: 26px; }
+  header h1 { font-size: 1rem; font-weight: 700; }
+  header p { font-size: 0.76rem; opacity: 0.8; margin-top: 2px; }
+
+  main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+
+  .card {
+    background: white;
+    border-radius: 24px;
+    padding: 56px 48px;
+    max-width: 560px;
+    width: 100%;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+    text-align: center;
+  }
+
+  .check-circle {
+    width: 88px; height: 88px;
+    background: var(--vert-pale);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 28px;
+    animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  @keyframes pop {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .check-circle svg {
+    width: 44px; height: 44px;
+  }
+
+  .titre {
+    font-size: 1.55rem;
+    font-weight: 800;
+    color: var(--vert-fonce);
+    line-height: 1.25;
+    margin-bottom: 16px;
+  }
+  .titre .prenom {
+    color: var(--vert);
+  }
+
+  .message-principal {
+    font-size: 1rem;
+    color: #374151;
+    line-height: 1.65;
+    margin-bottom: 28px;
+  }
+
+  .encart {
+    background: var(--vert-pale);
+    border: 1.5px solid #c6dece;
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 32px;
+    text-align: left;
+  }
+  .encart p {
+    font-size: 0.88rem;
+    color: var(--vert-fonce);
+    line-height: 1.6;
+  }
+  .encart strong {
+    font-weight: 700;
+  }
+
+  .feuilles {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 32px;
+    font-size: 1.4rem;
+    animation: floatin 2s ease-in-out infinite alternate;
+  }
+  @keyframes floatin {
+    from { transform: translateY(0); }
+    to { transform: translateY(-6px); }
+  }
+
+  footer-note {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--gris);
+    line-height: 1.5;
+  }
+
+  @media (max-width: 560px) {
+    .card { padding: 40px 24px; }
+    .titre { font-size: 1.3rem; }
+    header { padding: 14px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="icon">🌿</span>
+  <div>
+    <h1>Annuaire de la Couleur Végétale</h1>
+    <p>Carte interactive des acteurs en France</p>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <div class="check-circle">
+      <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="22" cy="22" r="22" fill="#4a7c59" opacity="0.12"/>
+        <path d="M12 22.5L19 30L33 15" stroke="#4a7c59" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <div class="feuilles">🌿 🌱 🌿</div>
+
+    <h2 class="titre">
+      C'est confirmé<span id="prenom-txt"></span> !<br>
+      Tu apparais bien sur l'annuaire<br>des acteurs de la couleur végétale.
+    </h2>
+
+    <p class="message-principal">
+      Ta fiche est maintenant visible sur la carte interactive.<br>
+      Bienvenue dans cette belle communauté 🌱
+    </p>
+
+    <div class="encart">
+      <p><strong>🗺️ Tu veux explorer l'annuaire ?</strong><br>
+      L'accès à la carte est réservé aux membres de la Guilde. Si tu en fais partie, tu as déjà accès au lien te permettant de créer ton compte et d'y accéder.</p>
+    </div>
+
+    <footer-note>
+      Une question ? Contacte Pauline directement.
+    </footer-note>
+  </div>
+</main>
+
+<script>
+  // Récupérer le prénom depuis l'URL : ?prenom=Marie
+  const params = new URLSearchParams(window.location.search);
+  const prenom = params.get('prenom');
+  if (prenom) {
+    document.getElementById('prenom-txt').innerHTML = `, <span class="prenom">${prenom}</span>`;
+  }
+</script>
+
+</body>
+</html>

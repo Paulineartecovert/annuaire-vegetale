@@ -68,7 +68,30 @@
       <h3>🔍 Rechercher</h3>
       <input class="search-box" type="text" id="search-nom" placeholder="Nom, description…" oninput="renderAll()">
       <input class="search-box" type="text" id="search-ville" placeholder="Ville…" oninput="renderAll()">
-      <div class="filter-tags" id="filter-tags"></div>
+      <select id="filter-select" onchange="setFilter(this.value)" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:0.84rem;outline:none;background:white;color:#2d2d2d;cursor:pointer;">
+        <option value="Tous">🌿 Toutes les activités</option>
+        <option value="Agricultrice tinctoriale">🌾 Agricultrice tinctoriale</option>
+        <option value="Jardinière tinctoriale">🌱 Jardinière tinctoriale</option>
+        <option value="Productrice de fibres naturelles">🪢 Productrice de fibres naturelles</option>
+        <option value="Extracteur de colorants végétaux">🧪 Extracteur de colorants végétaux</option>
+        <option value="Producteur de pigments végétaux">🎨 Producteur de pigments végétaux</option>
+        <option value="Teinturière">🪣 Teinturière</option>
+        <option value="Ennoblisseur">🧵 Ennoblisseur</option>
+        <option value="Artisane savonnière">🧼 Artisane savonnière</option>
+        <option value="Autres cosmétiques que savons">🌸 Autres cosmétiques que savons</option>
+        <option value="Artiste utilisant la couleur végétale">🎭 Artiste utilisant la couleur végétale</option>
+        <option value="Beaux-arts : Encres / Enluminure / Peinture naturelle">🖌️ Beaux-arts : Encres / Enluminure / Peinture naturelle</option>
+        <option value="Tisserande / fileuse / tricoteuse">🧶 Tisserande / fileuse / tricoteuse</option>
+        <option value="Créatrice mode / styliste">👗 Créatrice mode / styliste</option>
+        <option value="Marque">🏷️ Marque</option>
+        <option value="Formatrice / Centre de formation">📚 Formatrice / Centre de formation</option>
+        <option value="Chercheuse / scientifique">🔬 Chercheuse / scientifique</option>
+        <option value="Historienne / Ethnobotaniste / Archéologue">📜 Historienne / Ethnobotaniste / Archéologue</option>
+        <option value="Médiatrice / animatrice tinctoriale">🤝 Médiatrice / animatrice tinctoriale</option>
+        <option value="Association">🫂 Association</option>
+        <option value="Autres ressources colorantes (Cochenille, Ocres...)">🌈 Autres ressources colorantes</option>
+        <option value="Autre">✏️ Autre</option>
+      </select>
     </div>
     <div class="count-badge" id="count-badge">Chargement…</div>
     <div class="acteurs-list" id="acteurs-list">
@@ -141,7 +164,6 @@
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap', maxZoom: 18
     }).addTo(map);
-    initFilters();
   }
 
   async function loadActeurs() {
@@ -235,30 +257,8 @@
     document.getElementById('card-'+id)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  function initFilters() {
-    document.getElementById('filter-tags').innerHTML = categories.map(c => {
-      const picto = c === 'Tous' ? '🌿' : (metierPictos[c] || (c === 'Autre' ? '✏️' : '🌿'));
-      const couleur = catColors[c] || '#4a7c59';
-      const isActive = c === 'Tous';
-      return `<span class="filter-tag" id="ft-${c.replace(/[^a-zA-Z]/g,'_')}"
-        style="background:${isActive?couleur+'20':'#f3f4f6'};color:${isActive?couleur:'#6b7280'};border-color:${isActive?couleur:'#e5e7eb'}"
-        onclick="setFilter('${c.replace(/'/g, "\\'")}')">
-        ${picto} ${c === 'Tous' ? 'Tous' : c.substring(0,18)+(c.length>18?'…':'')}
-      </span>`;
-    }).join('');
-  }
-
   function setFilter(cat) {
     activeFilter = cat;
-    categories.forEach(c => {
-      const el = document.getElementById('ft-'+c.replace(/[^a-zA-Z]/g,'_'));
-      if (!el) return;
-      const active = c === cat;
-      const couleur = catColors[c] || '#4a7c59';
-      el.style.background = active ? couleur+'20' : '#f3f4f6';
-      el.style.color = active ? couleur : '#6b7280';
-      el.style.borderColor = active ? couleur : '#e5e7eb';
-    });
     renderAll();
   }
 </script>

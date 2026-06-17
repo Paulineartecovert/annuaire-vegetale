@@ -8,81 +8,45 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root { --vert: #4a7c59; --vert-clair: #7aad8a; --vert-pale: #eef4f0; --beige: #f5f0e8; --gris: #6b7280; --ombre: 0 4px 20px rgba(0,0,0,0.08); }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--beige); color: #2d2d2d; min-height: 100vh; }
-
-  header {
-    background: linear-gradient(135deg, var(--vert) 0%, #2d5a3d 100%);
-    color: white; padding: 20px 32px; display: flex; align-items: center;
-    justify-content: space-between; box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-  }
+  header { background: linear-gradient(135deg, var(--vert) 0%, #2d5a3d 100%); color: white; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
   .header-logo { display: flex; align-items: center; gap: 12px; }
   .header-logo .icon { font-size: 28px; }
   header h1 { font-size: 1.1rem; font-weight: 700; }
   header p { font-size: 0.78rem; opacity: 0.8; margin-top: 2px; }
   .header-link { color: rgba(255,255,255,0.8); font-size: 0.82rem; text-decoration: none; }
   .header-link:hover { color: white; }
-
   .container { max-width: 720px; margin: 0 auto; padding: 40px 24px; }
-
   .page-title { margin-bottom: 28px; }
   .page-title h2 { font-size: 1.6rem; font-weight: 800; color: var(--vert); margin-bottom: 8px; }
   .page-title p { color: var(--gris); font-size: 0.95rem; line-height: 1.6; }
-
-  .badge-public {
-    display: inline-block; background: #d1fae5; color: #065f46;
-    padding: 4px 12px; border-radius: 12px; font-size: 0.78rem;
-    font-weight: 700; margin-bottom: 12px;
-  }
-
+  .badge-public { display: inline-block; background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; margin-bottom: 12px; }
   .form-card { background: white; border-radius: 16px; padding: 32px; box-shadow: var(--ombre); }
   .form-section { margin-bottom: 28px; }
-  .form-section-title {
-    font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 1px; color: var(--vert); margin-bottom: 16px;
-    padding-bottom: 8px; border-bottom: 2px solid var(--vert-pale);
-  }
+  .form-section-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--vert); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--vert-pale); }
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .form-group { display: flex; flex-direction: column; gap: 6px; }
   .form-group.full { grid-column: 1 / -1; }
   label { font-size: 0.85rem; font-weight: 600; }
   label span.req { color: #e53e3e; margin-left: 2px; }
-  input, textarea, select {
-    padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px;
-    font-size: 0.9rem; font-family: inherit; outline: none; transition: border 0.2s; background: white;
-  }
+  input, textarea, select { padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px; font-size: 0.9rem; font-family: inherit; outline: none; transition: border 0.2s; background: white; }
   input:focus, textarea:focus { border-color: var(--vert); box-shadow: 0 0 0 3px rgba(74,124,89,0.1); }
   textarea { resize: vertical; min-height: 100px; }
-
   .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; }
-  .checkbox-item {
-    display: flex; align-items: center; gap: 8px; padding: 8px 14px;
-    border: 1.5px solid #e5e7eb; border-radius: 8px; cursor: pointer;
-    transition: all 0.2s; font-size: 0.85rem; user-select: none;
-  }
+  .checkbox-item { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; user-select: none; }
   .checkbox-item:hover { border-color: var(--vert-clair); background: var(--vert-pale); }
   .checkbox-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--vert); }
   .checkbox-item.checked { border-color: var(--vert); background: var(--vert-pale); font-weight: 600; }
-
-  .btn-submit {
-    width: 100%; padding: 15px; background: linear-gradient(135deg, var(--vert), #2d5a3d);
-    color: white; border: none; border-radius: 12px; font-size: 1rem;
-    font-weight: 700; cursor: pointer; transition: all 0.2s;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
+  .autre-precision { display: none; margin-top: 12px; }
+  .autre-precision.show { display: block; }
+  .btn-submit { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--vert), #2d5a3d); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(74,124,89,0.35); }
   .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
   .form-msg { font-size: 0.85rem; text-align: center; margin-top: 14px; padding: 12px; border-radius: 8px; display: none; }
   .form-msg.error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; display: block; }
-
-  @media (max-width: 600px) {
-    .form-grid { grid-template-columns: 1fr; }
-    .container { padding: 24px 16px; }
-    header { padding: 16px 20px; }
-  }
+  @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .container { padding: 24px 16px; } header { padding: 16px 20px; } }
 </style>
 </head>
 <body>
-
 <header>
   <div class="header-logo">
     <span class="icon">🌿</span>
@@ -103,6 +67,7 @@
     </div>
 
     <div class="form-card">
+      <!-- INFOS PERSONNELLES -->
       <div class="form-section">
         <div class="form-section-title">👤 Informations personnelles</div>
         <div class="form-grid">
@@ -115,7 +80,7 @@
             <input type="text" id="f-nom" placeholder="Dupont">
           </div>
           <div class="form-group full">
-            <label>Structure / Atelier / Entreprise</label>
+            <label>Nom de ton entreprise <span class="req">*</span></label>
             <input type="text" id="f-structure" placeholder="Atelier des Teintures Naturelles">
           </div>
           <div class="form-group">
@@ -123,15 +88,20 @@
             <input type="email" id="f-email" placeholder="marie@exemple.fr">
           </div>
           <div class="form-group">
-            <label>Site web</label>
+            <label>Lien du site internet <span class="req">*</span></label>
             <input type="url" id="f-site" placeholder="https://...">
           </div>
         </div>
       </div>
 
+      <!-- LOCALISATION -->
       <div class="form-section">
         <div class="form-section-title">📍 Localisation</div>
         <div class="form-grid">
+          <div class="form-group full">
+            <label>Adresse <span class="req">*</span></label>
+            <input type="text" id="f-adresse" placeholder="12 rue des Teinturiers">
+          </div>
           <div class="form-group full">
             <label>Ville <span class="req">*</span></label>
             <input type="text" id="f-ville" placeholder="Lyon">
@@ -147,19 +117,50 @@
         </div>
       </div>
 
+      <!-- ACTIVITÉS -->
       <div class="form-section">
         <div class="form-section-title">🎨 Activités</div>
         <div class="checkbox-group">
-          <label class="checkbox-item"><input type="checkbox" value="Teinture"> Teinture végétale</label>
-          <label class="checkbox-item"><input type="checkbox" value="Formation"> Formation / Enseignement</label>
-          <label class="checkbox-item"><input type="checkbox" value="Jardin"> Jardin tinctorial</label>
-          <label class="checkbox-item"><input type="checkbox" value="Recherche"> Recherche</label>
-          <label class="checkbox-item"><input type="checkbox" value="Créateur"> Création textile</label>
-          <label class="checkbox-item"><input type="checkbox" value="Vente"> Vente de plantes / matières</label>
-          <label class="checkbox-item"><input type="checkbox" value="Artisanat"> Artisanat d'art</label>
+          <label class="checkbox-item"><input type="checkbox" value="Agricultrice tinctoriale"> 🌾 Agricultrice tinctoriale</label>
+          <label class="checkbox-item"><input type="checkbox" value="Jardinière tinctoriale"> 🌱 Jardinière tinctoriale</label>
+          <label class="checkbox-item"><input type="checkbox" value="Productrice de fibres naturelles"> 🪢 Productrice de fibres naturelles</label>
+          <label class="checkbox-item"><input type="checkbox" value="Extracteur de colorants végétaux"> 🧪 Extracteur de colorants végétaux</label>
+          <label class="checkbox-item"><input type="checkbox" value="Producteur de pigments végétaux"> 🎨 Producteur de pigments végétaux</label>
+          <label class="checkbox-item"><input type="checkbox" value="Teinturière"> 🪣 Teinturière</label>
+          <label class="checkbox-item"><input type="checkbox" value="Ennoblisseur"> 🧵 Ennoblisseur</label>
+          <label class="checkbox-item"><input type="checkbox" value="Artisane savonnière"> 🧼 Artisane savonnière</label>
+          <label class="checkbox-item"><input type="checkbox" value="Autres cosmétiques que savons"> 🌸 Autres cosmétiques que savons</label>
+          <label class="checkbox-item"><input type="checkbox" value="Artiste utilisant la couleur végétale"> 🎭 Artiste utilisant la couleur végétale</label>
+          <label class="checkbox-item"><input type="checkbox" value="Beaux-arts : Encres / Enluminure / Peinture naturelle"> 🖌️ Beaux-arts : Encres / Enluminure / Peinture naturelle</label>
+          <label class="checkbox-item"><input type="checkbox" value="Tisserande / fileuse / tricoteuse"> 🧶 Tisserande / fileuse / tricoteuse</label>
+          <label class="checkbox-item"><input type="checkbox" value="Créatrice mode / styliste"> 👗 Créatrice mode / styliste</label>
+          <label class="checkbox-item"><input type="checkbox" value="Marque"> 🏷️ Marque</label>
+          <label class="checkbox-item"><input type="checkbox" value="Formatrice / Centre de formation"> 📚 Formatrice / Centre de formation</label>
+          <label class="checkbox-item"><input type="checkbox" value="Chercheuse / scientifique"> 🔬 Chercheuse / scientifique</label>
+          <label class="checkbox-item"><input type="checkbox" value="Historienne / Ethnobotaniste / Archéologue"> 📜 Historienne / Ethnobotaniste / Archéologue</label>
+          <label class="checkbox-item"><input type="checkbox" value="Médiatrice / animatrice tinctoriale"> 🤝 Médiatrice / animatrice tinctoriale</label>
+          <label class="checkbox-item"><input type="checkbox" value="Association"> 🫂 Association</label>
+          <label class="checkbox-item"><input type="checkbox" value="Autres ressources colorantes (Cochenille, Ocres...)"> 🌈 Autres ressources colorantes (Cochenille, Ocres...)</label>
+          <label class="checkbox-item" id="cb-autre-label"><input type="checkbox" id="cb-autre" value="Autre"> ✏️ Autre</label>
+        </div>
+        <div class="autre-precision" id="autre-precision">
+          <div class="form-group">
+            <label>Précisez votre activité</label>
+            <input type="text" id="f-autre-precision" placeholder="Décrivez votre activité…">
+          </div>
         </div>
       </div>
 
+      <!-- CE QUE TU CHERCHES -->
+      <div class="form-section">
+        <div class="form-section-title">🔍 Ce que tu cherches</div>
+        <div class="form-group">
+          <label>Un lieu, un fournisseur… <span class="req">*</span></label>
+          <textarea id="f-recherche" placeholder="Ex : Je cherche un fournisseur de fibres naturelles, un lieu de formation, un partenaire pour un projet…"></textarea>
+        </div>
+      </div>
+
+      <!-- PRÉSENTATION -->
       <div class="form-section">
         <div class="form-section-title">📝 Présentation</div>
         <div class="form-group">
@@ -180,15 +181,22 @@
   const SUPABASE_URL = 'https://dcrkzffhdwznmqokpkla.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjcmt6ZmZoZHd6bm1xb2twa2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwOTA1ODQsImV4cCI6MjA5NjY2NjU4NH0.q3mlZ3tcX1OO4pNOaP70zxZFnxvzBdmKT8EOY5WXfhc';
 
+  // Gestion des checkboxes
   document.querySelectorAll('.checkbox-item input[type="checkbox"]').forEach(cb => {
     cb.addEventListener('change', () => {
       cb.closest('.checkbox-item').classList.toggle('checked', cb.checked);
     });
   });
 
-  async function geocodeVille(ville) {
+  // Afficher le champ "précisez" si "Autre" est coché
+  document.getElementById('cb-autre').addEventListener('change', function() {
+    document.getElementById('autre-precision').classList.toggle('show', this.checked);
+  });
+
+  async function geocodeVille(ville, adresse) {
     try {
-      const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(ville + ', France')}&format=json&limit=1`);
+      const q = adresse ? `${adresse}, ${ville}, France` : `${ville}, France`;
+      const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`);
       const d = await r.json();
       if (d.length > 0) return { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) };
     } catch(e) {}
@@ -199,12 +207,17 @@
     const prenom = document.getElementById('f-prenom').value.trim();
     const nom = document.getElementById('f-nom').value.trim();
     const email = document.getElementById('f-email').value.trim();
+    const site_web = document.getElementById('f-site').value.trim();
+    const adresse = document.getElementById('f-adresse').value.trim();
     const ville = document.getElementById('f-ville').value.trim();
     const description = document.getElementById('f-description').value.trim();
+    const recherche = document.getElementById('f-recherche').value.trim();
     const msg = document.getElementById('form-msg');
     const btn = document.getElementById('btn-submit');
 
-    if (!prenom || !nom || !email || !ville || !description) {
+    const structure = document.getElementById('f-structure').value.trim();
+
+    if (!prenom || !nom || !email || !structure || !site_web || !adresse || !ville || !description || !recherche) {
       msg.className = 'form-msg error';
       msg.textContent = '⚠️ Merci de remplir tous les champs obligatoires (*)';
       return;
@@ -214,17 +227,25 @@
     btn.textContent = '⏳ Inscription en cours…';
     msg.style.display = 'none';
 
-    // Géocoder la ville
-    const coords = await geocodeVille(ville);
-    const activites = [...document.querySelectorAll('.checkbox-item input[type="checkbox"]:checked')].map(el => el.value);
+    const coords = await geocodeVille(ville, adresse);
 
-    // Insertion via fetch REST direct (contourne les blocages du client JS)
+    // Récupérer les activités cochées
+    let activites = [...document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked:not(#cb-autre)')]
+      .map(el => el.value);
+
+    // Ajouter "Autre : précision" si coché
+    if (document.getElementById('cb-autre').checked) {
+      const precision = document.getElementById('f-autre-precision').value.trim();
+      activites.push(precision ? `Autre : ${precision}` : 'Autre');
+    }
+
     const payload = {
       prenom,
       nom,
-      structure: document.getElementById('f-structure').value.trim() || null,
+      structure: structure || null,
       email,
-      site_web: document.getElementById('f-site').value.trim() || null,
+      site_web: site_web || null,
+      adresse,
       ville,
       departement: document.getElementById('f-dept').value.trim() || null,
       region: document.getElementById('f-region').value.trim() || null,
@@ -232,6 +253,7 @@
       longitude: coords?.lng || null,
       activites: activites.length ? activites : null,
       description,
+      recherche,
       approuve: true
     };
 
@@ -258,7 +280,6 @@
         return;
       }
 
-      // Succès → redirection vers la page de confirmation avec le prénom
       window.location.href = `/confirmation.html?prenom=${encodeURIComponent(prenom)}`;
 
     } catch(e) {

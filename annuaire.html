@@ -11,47 +11,25 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root { --vert: #4a7c59; --vert-clair: #7aad8a; --vert-pale: #eef4f0; --beige: #f5f0e8; --gris: #6b7280; --ombre: 0 4px 20px rgba(0,0,0,0.08); }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--beige); color: #2d2d2d; min-height: 100vh; }
-
-  header {
-    background: linear-gradient(135deg, var(--vert) 0%, #2d5a3d 100%);
-    color: white; padding: 16px 28px; display: flex; align-items: center;
-    justify-content: space-between; box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-  }
+  header { background: linear-gradient(135deg, var(--vert) 0%, #2d5a3d 100%); color: white; padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
   .header-logo { display: flex; align-items: center; gap: 10px; }
   .header-logo .icon { font-size: 26px; }
   header h1 { font-size: 1.1rem; font-weight: 700; }
   header p { font-size: 0.76rem; opacity: 0.8; margin-top: 1px; }
   .header-right { display: flex; align-items: center; gap: 10px; }
   .user-info { font-size: 0.8rem; opacity: 0.85; }
-  .btn-logout {
-    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
-    color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.78rem;
-    font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none;
-  }
+  .btn-logout { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; }
   .btn-logout:hover { background: rgba(255,255,255,0.25); }
 
-  .tabs { display: flex; background: white; border-bottom: 1px solid #e5e7eb; padding: 0 28px; box-shadow: var(--ombre); }
-  .tab {
-    padding: 14px 20px; cursor: pointer; font-size: 0.87rem; font-weight: 500;
-    color: var(--gris); border-bottom: 3px solid transparent; transition: all 0.2s;
-  }
-  .tab:hover { color: var(--vert); }
-  .tab.active { color: var(--vert); border-bottom-color: var(--vert); font-weight: 600; }
-
-  .panel { display: none; }
-  .panel.active { display: block; }
-  #panel-carte.active { display: flex; flex-direction: column; }
-
-  /* CARTE */
-  .carte-layout { display: flex; height: calc(100vh - 116px); }
+  .carte-layout { display: flex; height: calc(100vh - 64px); }
   #map { flex: 1; z-index: 1; }
-  .sidebar { width: 310px; background: white; overflow-y: auto; border-left: 1px solid #e5e7eb; display: flex; flex-direction: column; }
-  .sidebar-header { padding: 16px; border-bottom: 1px solid #e5e7eb; background: var(--vert-pale); }
+  .sidebar { width: 320px; background: white; overflow-y: auto; border-left: 1px solid #e5e7eb; display: flex; flex-direction: column; }
+  .sidebar-header { padding: 14px 16px; border-bottom: 1px solid #e5e7eb; background: var(--vert-pale); }
   .sidebar-header h3 { font-size: 0.88rem; font-weight: 700; color: var(--vert); margin-bottom: 8px; }
-  .search-box { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.84rem; outline: none; }
+  .search-box { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.84rem; outline: none; margin-bottom: 6px; }
   .search-box:focus { border-color: var(--vert); }
-  .filter-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
-  .filter-tag { padding: 3px 9px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: 1.5px solid transparent; transition: all 0.2s; }
+  .filter-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+  .filter-tag { padding: 3px 9px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; cursor: pointer; border: 1.5px solid transparent; transition: all 0.2s; }
   .count-badge { font-size: 0.78rem; font-weight: 600; color: var(--gris); padding: 7px 16px; background: var(--vert-pale); border-bottom: 1px solid #e5e7eb; text-align: center; }
   .acteurs-list { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 7px; }
   .acteur-card { background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; cursor: pointer; transition: all 0.2s; border-left: 4px solid var(--vert); }
@@ -59,25 +37,12 @@
   .acteur-card.selected { background: var(--vert-pale); }
   .acteur-name { font-weight: 700; font-size: 0.87rem; margin-bottom: 3px; }
   .acteur-meta { font-size: 0.74rem; color: var(--gris); margin-bottom: 5px; }
-  .acteur-tag { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 0.68rem; font-weight: 600; margin-right: 3px; }
+  .acteur-tag { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 0.68rem; font-weight: 600; margin-right: 3px; margin-bottom: 2px; }
   .empty-state { text-align: center; padding: 40px 20px; color: var(--gris); font-size: 0.85rem; }
   .loading { text-align: center; padding: 40px 20px; color: var(--gris); }
   .spinner { display: inline-block; width: 28px; height: 28px; border: 3px solid #e5e7eb; border-top-color: var(--vert); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 10px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* PROFIL */
-  #panel-profil { padding: 36px 28px; max-width: 680px; margin: 0 auto; }
-  #panel-profil h2 { font-size: 1.3rem; font-weight: 800; color: var(--vert); margin-bottom: 6px; }
-  #panel-profil .subtitle { color: var(--gris); font-size: 0.88rem; margin-bottom: 24px; }
-  .profil-card { background: white; border-radius: 14px; padding: 26px; box-shadow: var(--ombre); }
-
-  @media (max-width: 768px) {
-    .carte-layout { flex-direction: column; height: auto; }
-    #map { height: 50vh; }
-    .sidebar { width: 100%; height: 45vh; }
-    header { padding: 12px 16px; }
-    .tabs { padding: 0 10px; overflow-x: auto; }
-  }
+  @media (max-width: 768px) { .carte-layout { flex-direction: column; height: auto; } #map { height: 50vh; } .sidebar { width: 100%; height: 45vh; } header { padding: 12px 16px; } }
 </style>
 </head>
 <body>
@@ -87,7 +52,7 @@
     <span class="icon">🌿</span>
     <div>
       <h1>Annuaire de la Couleur Végétale</h1>
-      <p>Carte interactive des acteurs en France</p>
+      <p>Carte interactive des acteurs</p>
     </div>
   </div>
   <div class="header-right">
@@ -96,35 +61,19 @@
   </div>
 </header>
 
-<nav class="tabs">
-  <div class="tab active" onclick="switchTab('carte', this)">🗺️ Carte & Annuaire</div>
-  <div class="tab" onclick="switchTab('profil', this)">👤 Mon profil</div>
-</nav>
-
-<!-- CARTE -->
-<div id="panel-carte" class="panel active">
-  <div class="carte-layout">
-    <div id="map"></div>
-    <div class="sidebar">
-      <div class="sidebar-header">
-        <h3>🔍 Rechercher</h3>
-        <input class="search-box" type="text" placeholder="Nom, ville, activité…" oninput="filterActeurs(this.value)">
-        <div class="filter-tags" id="filter-tags"></div>
-      </div>
-      <div class="count-badge" id="count-badge">Chargement…</div>
-      <div class="acteurs-list" id="acteurs-list">
-        <div class="loading"><div class="spinner"></div><br>Chargement de l'annuaire…</div>
-      </div>
+<div class="carte-layout">
+  <div id="map"></div>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h3>🔍 Rechercher</h3>
+      <input class="search-box" type="text" id="search-nom" placeholder="Nom, description…" oninput="renderAll()">
+      <input class="search-box" type="text" id="search-ville" placeholder="Ville…" oninput="renderAll()">
+      <div class="filter-tags" id="filter-tags"></div>
     </div>
-  </div>
-</div>
-
-<!-- PROFIL -->
-<div id="panel-profil" class="panel">
-  <h2>👤 Mon profil</h2>
-  <p class="subtitle">Votre fiche dans l'annuaire</p>
-  <div id="profil-content">
-    <div class="loading"><div class="spinner"></div><br>Chargement…</div>
+    <div class="count-badge" id="count-badge">Chargement…</div>
+    <div class="acteurs-list" id="acteurs-list">
+      <div class="loading"><div class="spinner"></div><br>Chargement de l'annuaire…</div>
+    </div>
   </div>
 </div>
 
@@ -135,10 +84,46 @@
   const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
   let map, markers = [], acteurs = [], selectedId = null, activeFilter = 'Tous';
-  const categories = ['Tous','Teinture','Formation','Jardin','Recherche','Créateur','Vente','Artisanat'];
-  const catColors = { 'Tous':'#4a7c59','Teinture':'#4a7c59','Formation':'#7aad8a','Jardin':'#2d5a3d','Recherche':'#8b5e3c','Créateur':'#c0785a','Vente':'#a05c3c','Artisanat':'#6b7280' };
 
-  // Vérifier la session
+  // Pictos par métier
+  const metierPictos = {
+    'Agricultrice tinctoriale': '🌾',
+    'Jardinière tinctoriale': '🌱',
+    'Productrice de fibres naturelles': '🪢',
+    'Extracteur de colorants végétaux': '🧪',
+    'Producteur de pigments végétaux': '🎨',
+    'Teinturière': '🪣',
+    'Ennoblisseur': '🧵',
+    'Artisane savonnière': '🧼',
+    'Autres cosmétiques que savons': '🌸',
+    'Artiste utilisant la couleur végétale': '🎭',
+    'Beaux-arts : Encres / Enluminure / Peinture naturelle': '🖌️',
+    'Tisserande / fileuse / tricoteuse': '🧶',
+    'Créatrice mode / styliste': '👗',
+    'Marque': '🏷️',
+    'Formatrice / Centre de formation': '📚',
+    'Chercheuse / scientifique': '🔬',
+    'Historienne / Ethnobotaniste / Archéologue': '📜',
+    'Médiatrice / animatrice tinctoriale': '🤝',
+    'Association': '🫂',
+    'Autres ressources colorantes (Cochenille, Ocres...)': '🌈',
+  };
+
+  const categories = ['Tous','Agricultrice tinctoriale','Jardinière tinctoriale','Productrice de fibres naturelles','Extracteur de colorants végétaux','Producteur de pigments végétaux','Teinturière','Ennoblisseur','Artisane savonnière','Autres cosmétiques que savons','Artiste utilisant la couleur végétale','Beaux-arts : Encres / Enluminure / Peinture naturelle','Tisserande / fileuse / tricoteuse','Créatrice mode / styliste','Marque','Formatrice / Centre de formation','Chercheuse / scientifique','Historienne / Ethnobotaniste / Archéologue','Médiatrice / animatrice tinctoriale','Association','Autres ressources colorantes (Cochenille, Ocres...)','Autre'];
+
+  const catColors = {
+    'Tous':'#4a7c59','Agricultrice tinctoriale':'#5a8a3a','Jardinière tinctoriale':'#3d7a3d',
+    'Productrice de fibres naturelles':'#8a6a2a','Extracteur de colorants végétaux':'#6a5a8a',
+    'Producteur de pigments végétaux':'#8a3a6a','Teinturière':'#4a7c59','Ennoblisseur':'#2d5a6a',
+    'Artisane savonnière':'#8a6a5a','Autres cosmétiques que savons':'#7a5a8a',
+    'Artiste utilisant la couleur végétale':'#8a4a3a','Beaux-arts : Encres / Enluminure / Peinture naturelle':'#5a3a8a',
+    'Tisserande / fileuse / tricoteuse':'#3a6a8a','Créatrice mode / styliste':'#8a3a5a',
+    'Marque':'#5a6a3a','Formatrice / Centre de formation':'#3a5a8a',
+    'Chercheuse / scientifique':'#6a3a3a','Historienne / Ethnobotaniste / Archéologue':'#7a5a3a',
+    'Médiatrice / animatrice tinctoriale':'#3a8a6a','Association':'#6a8a3a',
+    'Autres ressources colorantes (Cochenille, Ocres...)':'#8a7a3a','Autre':'#6b7280'
+  };
+
   sb.auth.getSession().then(({ data: { session } }) => {
     if (!session) { window.location.href = '/index.html'; return; }
     document.getElementById('user-email').textContent = session.user.email;
@@ -166,22 +151,32 @@
     renderAll();
   }
 
-  function createIcon(couleur) {
+  function getPicto(activites) {
+    if (!activites || activites.length === 0) return '🌿';
+    for (const a of activites) {
+      if (metierPictos[a]) return metierPictos[a];
+      if (a.startsWith('Autre')) return '✏️';
+    }
+    return '🌿';
+  }
+
+  function createIcon(couleur, picto) {
     return L.divIcon({
       className: '',
-      html: `<div style="width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${couleur};border:3px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><span style="transform:rotate(45deg);font-size:11px;">🌿</span></div>`,
-      iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -34]
+      html: `<div style="width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${couleur};border:3px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><span style="transform:rotate(45deg);font-size:13px;">${picto}</span></div>`,
+      iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -38]
     });
   }
 
   function getFiltered() {
-    const s = (document.querySelector('.search-box')?.value || '').toLowerCase();
+    const sNom = (document.getElementById('search-nom')?.value || '').toLowerCase();
+    const sVille = (document.getElementById('search-ville')?.value || '').toLowerCase();
     return acteurs.filter(a => {
-      const matchFilter = activeFilter === 'Tous' || (a.activites && a.activites.includes(activeFilter));
-      const matchSearch = !s || (a.nom||'').toLowerCase().includes(s) || (a.ville||'').toLowerCase().includes(s)
-        || (a.description||'').toLowerCase().includes(s) || (a.structure||'').toLowerCase().includes(s)
-        || (a.prenom||'').toLowerCase().includes(s);
-      return matchFilter && matchSearch;
+      const matchFilter = activeFilter === 'Tous' || (a.activites && a.activites.some(act => act.includes(activeFilter)));
+      const matchNom = !sNom || (a.nom||'').toLowerCase().includes(sNom) || (a.prenom||'').toLowerCase().includes(sNom)
+        || (a.description||'').toLowerCase().includes(sNom) || (a.structure||'').toLowerCase().includes(sNom);
+      const matchVille = !sVille || (a.ville||'').toLowerCase().includes(sVille);
+      return matchFilter && matchNom && matchVille;
     });
   }
 
@@ -191,17 +186,20 @@
     const filtered = getFiltered();
     filtered.forEach(a => {
       if (!a.latitude || !a.longitude) return;
-      const couleur = catColors[(a.activites||[])[0]] || '#4a7c59';
-      const m = L.marker([a.latitude, a.longitude], { icon: createIcon(couleur) }).addTo(map);
+      const premierMetier = (a.activites||[])[0] || 'Tous';
+      const couleur = catColors[premierMetier] || '#4a7c59';
+      const picto = getPicto(a.activites);
+      const m = L.marker([a.latitude, a.longitude], { icon: createIcon(couleur, picto) }).addTo(map);
       m.bindPopup(`
-        <div style="font-family:'Segoe UI',sans-serif;min-width:185px;padding:4px">
+        <div style="font-family:'Segoe UI',sans-serif;min-width:200px;padding:4px">
           <div style="font-weight:800;font-size:0.92rem;color:#2d5a3d;margin-bottom:3px">${a.structure||(a.prenom+' '+a.nom)}</div>
           <div style="font-size:0.78rem;color:#6b7280;margin-bottom:6px">📍 ${a.ville}${a.region?' · '+a.region:''}</div>
-          <div style="font-size:0.8rem;margin-bottom:7px;line-height:1.5;color:#374151">${(a.description||'').substring(0,110)}${(a.description||'').length>110?'…':''}</div>
+          <div style="font-size:0.8rem;margin-bottom:7px;line-height:1.5;color:#374151">${(a.description||'').substring(0,120)}${(a.description||'').length>120?'…':''}</div>
+          ${a.recherche?`<div style="font-size:0.76rem;color:#6b7280;margin-bottom:6px;font-style:italic">🔍 Cherche : ${(a.recherche||'').substring(0,80)}${(a.recherche||'').length>80?'…':''}</div>`:''}
           ${a.site_web?`<a href="${a.site_web}" target="_blank" style="font-size:0.76rem;color:#4a7c59">🔗 Site web</a>`:''}
-          <div style="margin-top:5px">${(a.activites||[]).map(ac=>`<span style="background:#eef4f0;color:#4a7c59;padding:2px 6px;border-radius:8px;font-size:0.68rem;font-weight:600;margin-right:2px">${ac}</span>`).join('')}</div>
+          <div style="margin-top:6px">${(a.activites||[]).map(ac=>`<span style="background:#eef4f0;color:#4a7c59;padding:2px 6px;border-radius:8px;font-size:0.68rem;font-weight:600;margin-right:2px;display:inline-block;margin-bottom:2px">${getPicto([ac])} ${ac}</span>`).join('')}</div>
         </div>
-      `, { maxWidth: 240 });
+      `, { maxWidth: 260 });
       m.on('click', () => selectActeur(a.id));
       markers.push({ marker: m, id: a.id });
     });
@@ -213,11 +211,14 @@
     document.getElementById('count-badge').textContent = `${list.length} acteur${list.length>1?'s':''} dans l'annuaire`;
     if (list.length === 0) { el.innerHTML = '<div class="empty-state">Aucun résultat.</div>'; return; }
     el.innerHTML = list.map(a => {
-      const couleur = catColors[(a.activites||[])[0]] || '#4a7c59';
+      const premierMetier = (a.activites||[])[0] || 'Tous';
+      const couleur = catColors[premierMetier] || '#4a7c59';
+      const picto = getPicto(a.activites);
       return `<div class="acteur-card ${selectedId===a.id?'selected':''}" id="card-${a.id}" onclick="selectActeur('${a.id}')" style="border-left-color:${couleur}">
-        <div class="acteur-name">${a.structure||(a.prenom+' '+a.nom)}</div>
+        <div class="acteur-name">${picto} ${a.structure||(a.prenom+' '+a.nom)}</div>
         <div class="acteur-meta">📍 ${a.ville}${a.region?' · '+a.region:''}</div>
         <div>${(a.activites||[]).map(ac=>`<span class="acteur-tag" style="background:${couleur}20;color:${couleur}">${ac}</span>`).join('')}</div>
+        ${a.recherche?`<div style="font-size:0.72rem;color:var(--gris);margin-top:5px;font-style:italic">🔍 ${(a.recherche||'').substring(0,60)}${(a.recherche||'').length>60?'…':''}</div>`:''}
       </div>`;
     }).join('');
   }
@@ -234,60 +235,31 @@
     document.getElementById('card-'+id)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  function filterActeurs() { renderAll(); }
-
   function initFilters() {
-    document.getElementById('filter-tags').innerHTML = categories.map(c =>
-      `<span class="filter-tag" id="ft-${c}"
-        style="background:${c==='Tous'?catColors[c]+'20':'#f3f4f6'};color:${c==='Tous'?catColors[c]:'#6b7280'};border-color:${c==='Tous'?catColors[c]:'#e5e7eb'}"
-        onclick="setFilter('${c}')">${c}</span>`
-    ).join('');
+    document.getElementById('filter-tags').innerHTML = categories.map(c => {
+      const picto = c === 'Tous' ? '🌿' : (metierPictos[c] || (c === 'Autre' ? '✏️' : '🌿'));
+      const couleur = catColors[c] || '#4a7c59';
+      const isActive = c === 'Tous';
+      return `<span class="filter-tag" id="ft-${c.replace(/[^a-zA-Z]/g,'_')}"
+        style="background:${isActive?couleur+'20':'#f3f4f6'};color:${isActive?couleur:'#6b7280'};border-color:${isActive?couleur:'#e5e7eb'}"
+        onclick="setFilter('${c.replace(/'/g, "\\'")}')">
+        ${picto} ${c === 'Tous' ? 'Tous' : c.substring(0,18)+(c.length>18?'…':'')}
+      </span>`;
+    }).join('');
   }
 
   function setFilter(cat) {
     activeFilter = cat;
     categories.forEach(c => {
-      const el = document.getElementById('ft-'+c);
+      const el = document.getElementById('ft-'+c.replace(/[^a-zA-Z]/g,'_'));
       if (!el) return;
       const active = c === cat;
-      el.style.background = active ? catColors[c]+'20' : '#f3f4f6';
-      el.style.color = active ? catColors[c] : '#6b7280';
-      el.style.borderColor = active ? catColors[c] : '#e5e7eb';
+      const couleur = catColors[c] || '#4a7c59';
+      el.style.background = active ? couleur+'20' : '#f3f4f6';
+      el.style.color = active ? couleur : '#6b7280';
+      el.style.borderColor = active ? couleur : '#e5e7eb';
     });
     renderAll();
-  }
-
-  function switchTab(tab, el) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('panel-'+tab).classList.add('active');
-    if (el) el.classList.add('active');
-    if (tab === 'carte') setTimeout(() => map && map.invalidateSize(), 100);
-    if (tab === 'profil') loadProfil();
-  }
-
-  async function loadProfil() {
-    const { data: { user } } = await sb.auth.getUser();
-    if (!user) return;
-    const { data } = await sb.from('acteurs').select('*').eq('user_id', user.id).single();
-    const el = document.getElementById('profil-content');
-    if (!data) {
-      el.innerHTML = `<div class="profil-card" style="text-align:center;color:var(--gris);padding:40px">
-        <div style="font-size:2rem;margin-bottom:12px">🌱</div>
-        <p style="font-weight:600;margin-bottom:8px">Vous n'avez pas encore de fiche dans l'annuaire.</p>
-        <a href="/inscription.html" style="color:var(--vert);font-weight:600;font-size:0.9rem">→ Créer ma fiche</a>
-      </div>`;
-    } else {
-      el.innerHTML = `<div class="profil-card">
-        <div style="font-size:1.1rem;font-weight:800;color:var(--vert);margin-bottom:4px">${data.structure||(data.prenom+' '+data.nom)}</div>
-        <div style="font-size:0.83rem;color:var(--gris);margin-bottom:14px">📍 ${data.ville}${data.region?' · '+data.region:''}</div>
-        <div style="font-size:0.88rem;line-height:1.6;margin-bottom:14px">${data.description}</div>
-        <div style="margin-bottom:14px">${(data.activites||[]).map(a=>`<span style="background:var(--vert-pale);color:var(--vert);padding:3px 10px;border-radius:10px;font-size:0.76rem;font-weight:600;margin-right:5px">${a}</span>`).join('')}</div>
-        <div style="font-size:0.8rem;color:var(--gris);padding-top:14px;border-top:1px solid #e5e7eb">
-          📧 ${data.email}${data.site_web?` · <a href="${data.site_web}" target="_blank" style="color:var(--vert)">Site web</a>`:''}
-        </div>
-      </div>`;
-    }
   }
 </script>
 </body>

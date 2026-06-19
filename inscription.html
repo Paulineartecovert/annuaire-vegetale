@@ -102,17 +102,17 @@
             <label>Adresse <span class="req">*</span></label>
             <input type="text" id="f-adresse" placeholder="12 rue des Teinturiers">
           </div>
-          <div class="form-group full">
+          <div class="form-group">
             <label>Ville <span class="req">*</span></label>
             <input type="text" id="f-ville" placeholder="Lyon">
           </div>
           <div class="form-group">
-            <label>Département</label>
-            <input type="text" id="f-dept" placeholder="69">
+            <label>Code postal</label>
+            <input type="text" id="f-cp" placeholder="69000">
           </div>
-          <div class="form-group">
-            <label>Région</label>
-            <input type="text" id="f-region" placeholder="Auvergne-Rhône-Alpes">
+          <div class="form-group full">
+            <label>Pays <span class="req">*</span></label>
+            <input type="text" id="f-pays" placeholder="France" value="France">
           </div>
         </div>
       </div>
@@ -122,7 +122,7 @@
         <div class="form-section-title">🎨 Activités</div>
         <div class="checkbox-group">
           <label class="checkbox-item"><input type="checkbox" value="Agricultrice tinctoriale"> 🌾 Agricultrice tinctoriale</label>
-          <label class="checkbox-item"><input type="checkbox" value="Jardinière tinctoriale"> 🌱 Jardinière tinctoriale</label>
+          <label class="checkbox-item"><input type="checkbox" value="Jardin tinctorial"> 🌱 Jardin tinctorial</label>
           <label class="checkbox-item"><input type="checkbox" value="Productrice de fibres naturelles"> 🪢 Productrice de fibres naturelles</label>
           <label class="checkbox-item"><input type="checkbox" value="Extracteur de colorants végétaux"> 🧪 Extracteur de colorants végétaux</label>
           <label class="checkbox-item"><input type="checkbox" value="Producteur de pigments végétaux"> 🎨 Producteur de pigments végétaux</label>
@@ -193,9 +193,9 @@
     document.getElementById('autre-precision').classList.toggle('show', this.checked);
   });
 
-  async function geocodeVille(ville, adresse) {
+  async function geocodeVille(ville, adresse, pays) {
     try {
-      const q = adresse ? `${adresse}, ${ville}, France` : `${ville}, France`;
+      const q = adresse ? `${adresse}, ${ville}, ${pays}` : `${ville}, ${pays}`;
       const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`);
       const d = await r.json();
       if (d.length > 0) return { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) };
@@ -210,6 +210,7 @@
     const site_web = document.getElementById('f-site').value.trim();
     const adresse = document.getElementById('f-adresse').value.trim();
     const ville = document.getElementById('f-ville').value.trim();
+    const pays = document.getElementById('f-pays').value.trim();
     const description = document.getElementById('f-description').value.trim();
     const recherche = document.getElementById('f-recherche').value.trim();
     const msg = document.getElementById('form-msg');
@@ -217,7 +218,7 @@
 
     const structure = document.getElementById('f-structure').value.trim();
 
-    if (!prenom || !nom || !email || !structure || !site_web || !adresse || !ville || !description || !recherche) {
+    if (!prenom || !nom || !email || !structure || !site_web || !adresse || !ville || !pays || !description || !recherche) {
       msg.className = 'form-msg error';
       msg.textContent = '⚠️ Merci de remplir tous les champs obligatoires (*)';
       return;
@@ -227,7 +228,7 @@
     btn.textContent = '⏳ Inscription en cours…';
     msg.style.display = 'none';
 
-    const coords = await geocodeVille(ville, adresse);
+    const coords = await geocodeVille(ville, adresse, pays);
 
     // Récupérer les activités cochées
     let activites = [...document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked:not(#cb-autre)')]
@@ -247,8 +248,8 @@
       site_web: site_web || null,
       adresse,
       ville,
-      departement: document.getElementById('f-dept').value.trim() || null,
-      region: document.getElementById('f-region').value.trim() || null,
+      pays,
+      code_postal: document.getElementById('f-cp').value.trim() || null,
       latitude: coords?.lat || null,
       longitude: coords?.lng || null,
       activites: activites.length ? activites : null,

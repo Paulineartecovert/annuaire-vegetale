@@ -71,7 +71,7 @@
       <select id="filter-select" onchange="setFilter(this.value)" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:0.84rem;outline:none;background:white;color:#2d2d2d;cursor:pointer;">
         <option value="Tous">🌿 Toutes les activités</option>
         <option value="Agricultrice tinctoriale">🌾 Agricultrice tinctoriale</option>
-        <option value="Jardinière tinctoriale">🌱 Jardinière tinctoriale</option>
+        <option value="Jardin tinctorial">🌱 Jardin tinctorial</option>
         <option value="Productrice de fibres naturelles">🪢 Productrice de fibres naturelles</option>
         <option value="Extracteur de colorants végétaux">🧪 Extracteur de colorants végétaux</option>
         <option value="Producteur de pigments végétaux">🎨 Producteur de pigments végétaux</option>
@@ -111,7 +111,7 @@
   // Pictos par métier
   const metierPictos = {
     'Agricultrice tinctoriale': '🌾',
-    'Jardinière tinctoriale': '🌱',
+    'Jardin tinctorial': '🌱',
     'Productrice de fibres naturelles': '🪢',
     'Extracteur de colorants végétaux': '🧪',
     'Producteur de pigments végétaux': '🎨',
@@ -132,10 +132,10 @@
     'Autres ressources colorantes (Cochenille, Ocres...)': '🌈',
   };
 
-  const categories = ['Tous','Agricultrice tinctoriale','Jardinière tinctoriale','Productrice de fibres naturelles','Extracteur de colorants végétaux','Producteur de pigments végétaux','Teinturière','Ennoblisseur','Artisane savonnière','Autres cosmétiques que savons','Artiste utilisant la couleur végétale','Beaux-arts : Encres / Enluminure / Peinture naturelle','Tisserande / fileuse / tricoteuse','Créatrice mode / styliste','Marque','Formatrice / Centre de formation','Chercheuse / scientifique','Historienne / Ethnobotaniste / Archéologue','Médiatrice / animatrice tinctoriale','Association','Autres ressources colorantes (Cochenille, Ocres...)','Autre'];
+  const categories = ['Tous','Agricultrice tinctoriale','Jardin tinctorial','Productrice de fibres naturelles','Extracteur de colorants végétaux','Producteur de pigments végétaux','Teinturière','Ennoblisseur','Artisane savonnière','Autres cosmétiques que savons','Artiste utilisant la couleur végétale','Beaux-arts : Encres / Enluminure / Peinture naturelle','Tisserande / fileuse / tricoteuse','Créatrice mode / styliste','Marque','Formatrice / Centre de formation','Chercheuse / scientifique','Historienne / Ethnobotaniste / Archéologue','Médiatrice / animatrice tinctoriale','Association','Autres ressources colorantes (Cochenille, Ocres...)','Autre'];
 
   const catColors = {
-    'Tous':'#4a7c59','Agricultrice tinctoriale':'#5a8a3a','Jardinière tinctoriale':'#3d7a3d',
+    'Tous':'#4a7c59','Agricultrice tinctoriale':'#5a8a3a','Jardin tinctorial':'#3d7a3d',
     'Productrice de fibres naturelles':'#8a6a2a','Extracteur de colorants végétaux':'#6a5a8a',
     'Producteur de pigments végétaux':'#8a3a6a','Teinturière':'#4a7c59','Ennoblisseur':'#2d5a6a',
     'Artisane savonnière':'#8a6a5a','Autres cosmétiques que savons':'#7a5a8a',
@@ -215,7 +215,7 @@
       m.bindPopup(`
         <div style="font-family:'Segoe UI',sans-serif;min-width:200px;padding:4px">
           <div style="font-weight:800;font-size:0.92rem;color:#2d5a3d;margin-bottom:3px">${a.structure||(a.prenom+' '+a.nom)}</div>
-          <div style="font-size:0.78rem;color:#6b7280;margin-bottom:6px">📍 ${a.ville}${a.region?' · '+a.region:''}</div>
+          <div style="font-size:0.78rem;color:#6b7280;margin-bottom:6px">📍 ${a.code_postal?a.code_postal+' ':''}${a.ville}${a.pays&&a.pays!=='France'?' · '+a.pays:''}</div>
           <div style="font-size:0.8rem;margin-bottom:7px;line-height:1.5;color:#374151">${(a.description||'').substring(0,120)}${(a.description||'').length>120?'…':''}</div>
           ${a.recherche?`<div style="font-size:0.76rem;color:#6b7280;margin-bottom:6px;font-style:italic">🔍 Cherche : ${(a.recherche||'').substring(0,80)}${(a.recherche||'').length>80?'…':''}</div>`:''}
           ${a.site_web?`<a href="${a.site_web}" target="_blank" style="font-size:0.76rem;color:#4a7c59">🔗 Site web</a>`:''}
@@ -238,7 +238,7 @@
       const picto = getPicto(a.activites);
       return `<div class="acteur-card ${selectedId===a.id?'selected':''}" id="card-${a.id}" onclick="selectActeur('${a.id}')" style="border-left-color:${couleur}">
         <div class="acteur-name">${picto} ${a.structure||(a.prenom+' '+a.nom)}</div>
-        <div class="acteur-meta">📍 ${a.ville}${a.region?' · '+a.region:''}</div>
+        <div class="acteur-meta">📍 ${a.code_postal?a.code_postal+' ':''}${a.ville}${a.pays&&a.pays!=='France'?' · '+a.pays:''}</div>
         <div>${(a.activites||[]).map(ac=>`<span class="acteur-tag" style="background:${couleur}20;color:${couleur}">${ac}</span>`).join('')}</div>
         ${a.recherche?`<div style="font-size:0.72rem;color:var(--gris);margin-top:5px;font-style:italic">🔍 ${(a.recherche||'').substring(0,60)}${(a.recherche||'').length>60?'…':''}</div>`:''}
       </div>`;

@@ -6,7 +6,6 @@
 <title>Annuaire de la Couleur Végétale</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root { --vert: #4a7c59; --vert-clair: #7aad8a; --vert-pale: #eef4f0; --beige: #f5f0e8; --gris: #6b7280; --ombre: 0 4px 20px rgba(0,0,0,0.08); }
@@ -101,45 +100,56 @@
 </div>
 
 <script>
-  const SUPABASE_URL = 'https://dcrkzffhdwznmqokpkla.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjcmt6ZmZoZHd6bm1xb2twa2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwOTA1ODQsImV4cCI6MjA5NjY2NjU4NH0.q3mlZ3tcX1OO4pNOaP70zxZFnxvzBdmKT8EOY5WXfhc';
-  const { createClient } = supabase;
-  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+  // Session stockée en localStorage (pas de clé API visible)
+  function getSession() {
+    return JSON.parse(localStorage.getItem('artecovert_session') || 'null');
+  }
+
+  function saveSession(data) {
+    localStorage.setItem('artecovert_session', JSON.stringify(data));
+  }
+
+  async function refreshSession() {
+    const session = getSession();
+    if (!session?.refresh_token) return null;
+    const res = await fetch('/api/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: session.refresh_token })
+    });
+    const data = await res.json();
+    if (data.user) { saveSession(data); return data; }
+    return null;
+  }
+
+  async function handleLogout() {
+    localStorage.removeItem('artecovert_session');
+    window.location.href = '/index.html';
+  }
 
   let map, markers = [], acteurs = [], selectedId = null, activeFilter = 'Tous';
 
-  // Pictos par métier
   const metierPictos = {
-    'Agricultrice tinctoriale': '🌾',
-    'Jardin tinctorial': '🌱',
-    'Productrice de fibres naturelles': '🪢',
-    'Extracteur de colorants végétaux': '🧪',
-    'Producteur de pigments végétaux': '🎨',
-    'Teinturière': '🪣',
-    'Ennoblisseur': '🧵',
-    'Artisane savonnière': '🧼',
-    'Autres cosmétiques que savons': '🌸',
-    'Artiste utilisant la couleur végétale': '🎭',
+    'Agricultrice tinctoriale': '🌾', 'Jardin tinctorial': '🌱',
+    'Productrice de fibres naturelles': '🪢', 'Extracteur de colorants végétaux': '🧪',
+    'Producteur de pigments végétaux': '🎨', 'Teinturière': '🪣',
+    'Ennoblisseur': '🧵', 'Artisane savonnière': '🧼',
+    'Autres cosmétiques que savons': '🌸', 'Artiste utilisant la couleur végétale': '🎭',
     'Beaux-arts : Encres / Enluminure / Peinture naturelle': '🖌️',
-    'Tisserande / fileuse / tricoteuse': '🧶',
-    'Créatrice mode / styliste': '👗',
-    'Marque': '🏷️',
-    'Formatrice / Centre de formation': '📚',
-    'Chercheuse / scientifique': '🔬',
-    'Historienne / Ethnobotaniste / Archéologue': '📜',
-    'Médiatrice / animatrice tinctoriale': '🤝',
-    'Association': '🫂',
+    'Tisserande / fileuse / tricoteuse': '🧶', 'Créatrice mode / styliste': '👗',
+    'Marque': '🏷️', 'Formatrice / Centre de formation': '📚',
+    'Chercheuse / scientifique': '🔬', 'Historienne / Ethnobotaniste / Archéologue': '📜',
+    'Médiatrice / animatrice tinctoriale': '🤝', 'Association': '🫂',
     'Autres ressources colorantes (Cochenille, Ocres...)': '🌈',
   };
-
-  const categories = ['Tous','Agricultrice tinctoriale','Jardin tinctorial','Productrice de fibres naturelles','Extracteur de colorants végétaux','Producteur de pigments végétaux','Teinturière','Ennoblisseur','Artisane savonnière','Autres cosmétiques que savons','Artiste utilisant la couleur végétale','Beaux-arts : Encres / Enluminure / Peinture naturelle','Tisserande / fileuse / tricoteuse','Créatrice mode / styliste','Marque','Formatrice / Centre de formation','Chercheuse / scientifique','Historienne / Ethnobotaniste / Archéologue','Médiatrice / animatrice tinctoriale','Association','Autres ressources colorantes (Cochenille, Ocres...)','Autre'];
 
   const catColors = {
     'Tous':'#4a7c59','Agricultrice tinctoriale':'#5a8a3a','Jardin tinctorial':'#3d7a3d',
     'Productrice de fibres naturelles':'#8a6a2a','Extracteur de colorants végétaux':'#6a5a8a',
     'Producteur de pigments végétaux':'#8a3a6a','Teinturière':'#4a7c59','Ennoblisseur':'#2d5a6a',
     'Artisane savonnière':'#8a6a5a','Autres cosmétiques que savons':'#7a5a8a',
-    'Artiste utilisant la couleur végétale':'#8a4a3a','Beaux-arts : Encres / Enluminure / Peinture naturelle':'#5a3a8a',
+    'Artiste utilisant la couleur végétale':'#8a4a3a',
+    'Beaux-arts : Encres / Enluminure / Peinture naturelle':'#5a3a8a',
     'Tisserande / fileuse / tricoteuse':'#3a6a8a','Créatrice mode / styliste':'#8a3a5a',
     'Marque':'#5a6a3a','Formatrice / Centre de formation':'#3a5a8a',
     'Chercheuse / scientifique':'#6a3a3a','Historienne / Ethnobotaniste / Archéologue':'#7a5a3a',
@@ -147,38 +157,36 @@
     'Autres ressources colorantes (Cochenille, Ocres...)':'#8a7a3a','Autre':'#6b7280'
   };
 
-  sb.auth.getSession().then(({ data: { session } }) => {
-    if (!session) { window.location.href = '/index.html'; return; }
-    document.getElementById('user-email').textContent = session.user.email;
+  // Vérifier la session au chargement
+  (async () => {
+    const session = getSession();
+    if (!session?.access_token) { window.location.href = '/index.html'; return; }
+    // Tenter un refresh pour vérifier validité
+    const refreshed = await refreshSession();
+    if (!refreshed) { window.location.href = '/index.html'; return; }
+    document.getElementById('user-email').textContent = refreshed.user.email;
     initMap();
     loadActeurs();
-  });
-
-  async function handleLogout() {
-    await sb.auth.signOut();
-    window.location.href = '/index.html';
-  }
-
-  function initMap() {
-    map = L.map('map').setView([46.5, 2.5], 6);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap', maxZoom: 18
-    }).addTo(map);
-  }
+  })();
 
   async function loadActeurs() {
-    const { data, error } = await sb.from('acteurs').select('*').order('created_at', { ascending: false });
-    if (error) { console.error(error); return; }
-    acteurs = data || [];
-    renderAll();
+    const session = getSession();
+    try {
+      const res = await fetch('/api/acteurs', {
+        headers: { 'Authorization': 'Bearer ' + session.access_token }
+      });
+      if (res.status === 401) { window.location.href = '/index.html'; return; }
+      const data = await res.json();
+      acteurs = data || [];
+      renderAll();
+    } catch(e) {
+      console.error('Erreur chargement acteurs:', e);
+    }
   }
 
   function getPicto(activites) {
     if (!activites || activites.length === 0) return '🌿';
-    for (const a of activites) {
-      if (metierPictos[a]) return metierPictos[a];
-      if (a.startsWith('Autre')) return '✏️';
-    }
+    for (const a of activites) { if (metierPictos[a]) return metierPictos[a]; if (a.startsWith('Autre')) return '✏️'; }
     return '🌿';
   }
 
@@ -195,8 +203,7 @@
     const sVille = (document.getElementById('search-ville')?.value || '').toLowerCase();
     return acteurs.filter(a => {
       const matchFilter = activeFilter === 'Tous' || (a.activites && a.activites.some(act => act.includes(activeFilter)));
-      const matchNom = !sNom || (a.nom||'').toLowerCase().includes(sNom) || (a.prenom||'').toLowerCase().includes(sNom)
-        || (a.description||'').toLowerCase().includes(sNom) || (a.structure||'').toLowerCase().includes(sNom);
+      const matchNom = !sNom || (a.nom||'').toLowerCase().includes(sNom) || (a.prenom||'').toLowerCase().includes(sNom) || (a.description||'').toLowerCase().includes(sNom) || (a.structure||'').toLowerCase().includes(sNom);
       const matchVille = !sVille || (a.ville||'').toLowerCase().includes(sVille);
       return matchFilter && matchNom && matchVille;
     });
@@ -212,16 +219,14 @@
       const couleur = catColors[premierMetier] || '#4a7c59';
       const picto = getPicto(a.activites);
       const m = L.marker([a.latitude, a.longitude], { icon: createIcon(couleur, picto) }).addTo(map);
-      m.bindPopup(`
-        <div style="font-family:'Segoe UI',sans-serif;min-width:200px;padding:4px">
-          <div style="font-weight:800;font-size:0.92rem;color:#2d5a3d;margin-bottom:3px">${a.structure||(a.prenom+' '+a.nom)}</div>
-          <div style="font-size:0.78rem;color:#6b7280;margin-bottom:6px">📍 ${a.code_postal?a.code_postal+' ':''}${a.ville}${a.pays&&a.pays!=='France'?' · '+a.pays:''}</div>
-          <div style="font-size:0.8rem;margin-bottom:7px;line-height:1.5;color:#374151">${(a.description||'').substring(0,120)}${(a.description||'').length>120?'…':''}</div>
-          ${a.recherche?`<div style="font-size:0.76rem;color:#6b7280;margin-bottom:6px;font-style:italic">🔍 Cherche : ${(a.recherche||'').substring(0,80)}${(a.recherche||'').length>80?'…':''}</div>`:''}
-          ${a.site_web?`<a href="${a.site_web}" target="_blank" style="font-size:0.76rem;color:#4a7c59">🔗 Site web</a>`:''}
-          <div style="margin-top:6px">${(a.activites||[]).map(ac=>`<span style="background:#eef4f0;color:#4a7c59;padding:2px 6px;border-radius:8px;font-size:0.68rem;font-weight:600;margin-right:2px;display:inline-block;margin-bottom:2px">${getPicto([ac])} ${ac}</span>`).join('')}</div>
-        </div>
-      `, { maxWidth: 260 });
+      m.bindPopup(`<div style="font-family:'Segoe UI',sans-serif;min-width:200px;padding:4px">
+        <div style="font-weight:800;font-size:0.92rem;color:#2d5a3d;margin-bottom:3px">${a.structure||(a.prenom+' '+a.nom)}</div>
+        <div style="font-size:0.78rem;color:#6b7280;margin-bottom:6px">📍 ${a.code_postal?a.code_postal+' ':''}${a.ville}${a.pays&&a.pays!=='France'?' · '+a.pays:''}</div>
+        <div style="font-size:0.8rem;margin-bottom:7px;line-height:1.5;color:#374151">${(a.description||'').substring(0,120)}${(a.description||'').length>120?'…':''}</div>
+        ${a.recherche?`<div style="font-size:0.76rem;color:#6b7280;margin-bottom:6px;font-style:italic">🔍 ${(a.recherche||'').substring(0,80)}${(a.recherche||'').length>80?'…':''}</div>`:''}
+        ${a.site_web?`<a href="${a.site_web}" target="_blank" style="font-size:0.76rem;color:#4a7c59">🔗 Site web</a>`:''}
+        <div style="margin-top:6px">${(a.activites||[]).map(ac=>`<span style="background:#eef4f0;color:#4a7c59;padding:2px 6px;border-radius:8px;font-size:0.68rem;font-weight:600;margin-right:2px;display:inline-block;margin-bottom:2px">${getPicto([ac])} ${ac}</span>`).join('')}</div>
+      </div>`, { maxWidth: 260 });
       m.on('click', () => selectActeur(a.id));
       markers.push({ marker: m, id: a.id });
     });
@@ -260,6 +265,13 @@
   function setFilter(cat) {
     activeFilter = cat;
     renderAll();
+  }
+
+  function initMap() {
+    map = L.map('map').setView([46.5, 2.5], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap', maxZoom: 18
+    }).addTo(map);
   }
 </script>
 </body>

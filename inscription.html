@@ -179,9 +179,6 @@
 </div>
 
 <script>
-  const SUPABASE_URL = 'https://dcrkzffhdwznmqokpkla.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjcmt6ZmZoZHd6bm1xb2twa2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwOTA1ODQsImV4cCI6MjA5NjY2NjU4NH0.q3mlZ3tcX1OO4pNOaP70zxZFnxvzBdmKT8EOY5WXfhc';
-
   // Gestion des checkboxes
   document.querySelectorAll('.checkbox-item input[type="checkbox"]').forEach(cb => {
     cb.addEventListener('change', () => {
@@ -214,10 +211,9 @@
     const pays = document.getElementById('f-pays').value.trim();
     const description = document.getElementById('f-description').value.trim();
     const recherche = document.getElementById('f-recherche').value.trim();
+    const structure = document.getElementById('f-structure').value.trim();
     const msg = document.getElementById('form-msg');
     const btn = document.getElementById('btn-submit');
-
-    const structure = document.getElementById('f-structure').value.trim();
 
     if (!prenom || !nom || !email || !structure || !site_web || !adresse || !ville || !pays || !description || !recherche) {
       msg.className = 'form-msg error';
@@ -231,54 +227,36 @@
 
     const coords = await geocodeVille(ville, adresse, pays);
 
-    // Récupérer les activités cochées
     let activites = [...document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked:not(#cb-autre)')]
       .map(el => el.value);
-
-    // Ajouter "Autre : précision" si coché
     if (document.getElementById('cb-autre').checked) {
       const precision = document.getElementById('f-autre-precision').value.trim();
       activites.push(precision ? `Autre : ${precision}` : 'Autre');
     }
 
-    const payload = {
-      prenom,
-      nom,
-      structure: structure || null,
-      email,
-      site_web: site_web || null,
-      adresse,
-      ville,
-      pays,
-      code_postal: document.getElementById('f-cp').value.trim() || null,
-      latitude: coords?.lat || null,
-      longitude: coords?.lng || null,
-      activites: activites.length ? activites : null,
-      description,
-      recherche,
-      approuve: true
-    };
-
     try {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/acteurs`, {
+      // Appel vers notre API sécurisée (pas directement Supabase)
+      const response = await fetch('/api/inscription', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify(payload)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prenom, nom, structure, email, site_web, adresse, ville,
+          code_postal: document.getElementById('f-cp').value.trim() || null,
+          pays,
+          activites: activites.length ? activites : null,
+          description, recherche,
+          latitude: coords?.lat || null,
+          longitude: coords?.lng || null,
+        })
       });
 
       btn.disabled = false;
-      btn.textContent = '🌿 Rejoindre l\'annuaire';
+      btn.textContent = '🌿 Rejoindre l'annuaire';
 
       if (!response.ok) {
-        const errText = await response.text();
-        console.error('Erreur Supabase:', response.status, errText);
+        const err = await response.json();
         msg.className = 'form-msg error';
-        msg.textContent = `❌ Erreur lors de l'inscription (${response.status}). Veuillez réessayer.`;
+        msg.textContent = `❌ Erreur lors de l'inscription. Veuillez réessayer.`;
         return;
       }
 
@@ -286,7 +264,7 @@
 
     } catch(e) {
       btn.disabled = false;
-      btn.textContent = '🌿 Rejoindre l\'annuaire';
+      btn.textContent = '🌿 Rejoindre l'annuaire';
       msg.className = 'form-msg error';
       msg.textContent = '❌ Problème de connexion. Vérifiez votre réseau et réessayez.';
     }

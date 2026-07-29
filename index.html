@@ -4,87 +4,38 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Annuaire de la Couleur Végétale</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root { --vert: #4a7c59; --vert-clair: #7aad8a; --vert-pale: #eef4f0; --gris: #6b7280; }
-  body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #2d5a3d 0%, #4a7c59 50%, #7aad8a 100%);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .box {
-    background: white; border-radius: 24px; padding: 44px; width: 100%;
-    max-width: 440px; box-shadow: 0 24px 60px rgba(0,0,0,0.2); margin: 20px;
-  }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; background: linear-gradient(135deg, #2d5a3d 0%, #4a7c59 50%, #7aad8a 100%); display: flex; align-items: center; justify-content: center; }
+  .box { background: white; border-radius: 24px; padding: 44px; width: 100%; max-width: 440px; box-shadow: 0 24px 60px rgba(0,0,0,0.2); margin: 20px; }
   .logo { text-align: center; margin-bottom: 32px; }
   .logo .icon { font-size: 52px; display: block; margin-bottom: 14px; }
   .logo h1 { font-size: 1.5rem; font-weight: 800; color: var(--vert); }
   .logo p { font-size: 0.88rem; color: var(--gris); margin-top: 6px; line-height: 1.5; }
-
-  .section-title {
-    font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 1px; color: var(--vert); margin-bottom: 20px;
-    padding-bottom: 10px; border-bottom: 2px solid var(--vert-pale);
-  }
-
+  .section-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--vert); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--vert-pale); }
   .group { margin-bottom: 18px; }
   .group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
-  .group input {
-    width: 100%; padding: 12px 14px; border: 1.5px solid #e5e7eb;
-    border-radius: 10px; font-size: 0.92rem; outline: none; transition: border 0.2s;
-  }
+  .group input { width: 100%; padding: 12px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px; font-size: 0.92rem; outline: none; transition: border 0.2s; }
   .group input:focus { border-color: var(--vert); box-shadow: 0 0 0 3px rgba(74,124,89,0.1); }
-
-  .forgot {
-    display: block; text-align: right; font-size: 0.78rem;
-    color: var(--gris); margin-top: -10px; margin-bottom: 18px;
-    text-decoration: none; cursor: pointer;
-  }
+  .forgot { display: block; text-align: right; font-size: 0.78rem; color: var(--gris); margin-top: -10px; margin-bottom: 18px; text-decoration: none; cursor: pointer; }
   .forgot:hover { color: var(--vert); }
-
-  .btn {
-    width: 100%; padding: 14px; background: linear-gradient(135deg, var(--vert), #2d5a3d);
-    color: white; border: none; border-radius: 10px; font-size: 1rem;
-    font-weight: 700; cursor: pointer; transition: all 0.2s;
-  }
+  .btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--vert), #2d5a3d); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
   .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(74,124,89,0.35); }
   .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
   .msg { font-size: 0.83rem; text-align: center; margin-top: 12px; min-height: 20px; padding: 8px; border-radius: 8px; }
   .msg.error { background: #fef2f2; color: #dc2626; }
   .msg.success { background: var(--vert-pale); color: var(--vert); }
-  .msg.info { background: #eff6ff; color: #1d4ed8; }
-
   .reset-form { display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb; }
   .reset-form.show { display: block; }
   .reset-form label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
-  .reset-form input {
-    width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb;
-    border-radius: 10px; font-size: 0.9rem; outline: none; margin-bottom: 12px;
-  }
-  .reset-form input:focus { border-color: var(--vert); }
-  .btn-reset {
-    width: 100%; padding: 12px; background: var(--vert-pale);
-    color: var(--vert); border: 1.5px solid var(--vert-clair);
-    border-radius: 10px; font-size: 0.9rem; font-weight: 700; cursor: pointer;
-  }
+  .reset-form input { width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px; font-size: 0.9rem; outline: none; margin-bottom: 12px; }
+  .btn-reset { width: 100%; padding: 12px; background: var(--vert-pale); color: var(--vert); border: 1.5px solid var(--vert-clair); border-radius: 10px; font-size: 0.9rem; font-weight: 700; cursor: pointer; }
   .btn-reset:hover { background: #d4ead9; }
-
   .divider { margin: 24px 0; border: none; border-top: 1px solid #e5e7eb; }
-
-  .inscription-block {
-    background: var(--vert-pale); border-radius: 12px;
-    padding: 18px 20px; text-align: center;
-  }
-  .inscription-block p {
-    font-size: 0.82rem; color: var(--gris); margin-bottom: 10px; line-height: 1.5;
-  }
-  .inscription-block a {
-    display: inline-block; color: var(--vert); font-weight: 700;
-    font-size: 0.88rem; text-decoration: none;
-  }
+  .inscription-block { background: var(--vert-pale); border-radius: 12px; padding: 18px 20px; text-align: center; }
+  .inscription-block p { font-size: 0.82rem; color: var(--gris); margin-bottom: 10px; line-height: 1.5; }
+  .inscription-block a { display: inline-block; color: var(--vert); font-weight: 700; font-size: 0.88rem; text-decoration: none; }
   .inscription-block a:hover { text-decoration: underline; }
 </style>
 </head>
@@ -95,82 +46,80 @@
     <h1>Couleur Végétale</h1>
     <p>Carte interactive des acteurs de la couleur végétale<br>Connectez-vous pour accéder à la carte</p>
   </div>
-
   <div class="section-title">🔐 Connexion à l'annuaire</div>
-
   <div class="group">
     <label>Email</label>
     <input type="email" id="login-email" placeholder="votre@email.fr">
   </div>
   <div class="group">
     <label>Mot de passe</label>
-    <input type="password" id="login-password" placeholder="••••••••"
-      onkeydown="if(event.key==='Enter') handleLogin()">
+    <input type="password" id="login-password" placeholder="••••••••" onkeydown="if(event.key==='Enter') handleLogin()">
   </div>
-
   <span class="forgot" onclick="toggleReset()">Mot de passe oublié ?</span>
-
   <button class="btn" id="btn-login" onclick="handleLogin()">Accéder à l'annuaire →</button>
   <div class="msg" id="login-msg"></div>
-
-  <!-- Réinitialisation mot de passe -->
   <div class="reset-form" id="reset-form">
     <label>Votre email</label>
     <input type="email" id="reset-email" placeholder="votre@email.fr">
     <button class="btn-reset" onclick="handleReset()">Recevoir le lien de réinitialisation</button>
     <div class="msg" id="reset-msg"></div>
   </div>
-
   <hr class="divider">
-
   <div class="inscription-block">
     <p>Vous souhaitez apparaître sur la carte ?</p>
     <a href="/inscription.html">📝 Remplir le formulaire d'inscription →</a>
   </div>
 </div>
-
 <script>
-  const SUPABASE_URL = 'https://dcrkzffhdwznmqokpkla.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjcmt6ZmZoZHd6bm1xb2twa2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwOTA1ODQsImV4cCI6MjA5NjY2NjU4NH0.q3mlZ3tcX1OO4pNOaP70zxZFnxvzBdmKT8EOY5WXfhc';
-  const { createClient } = supabase;
-  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  // Si déjà connecté → rediriger vers l'annuaire
-  sb.auth.getSession().then(({ data: { session } }) => {
-    if (session) window.location.href = '/annuaire.html';
-  });
+  // Vérifier si déjà connecté
+  const session = JSON.parse(localStorage.getItem('artecovert_session') || 'null');
+  if (session?.access_token) {
+    // Vérifier que le token est encore valide
+    fetch('/api/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: session.refresh_token })
+    }).then(r => r.json()).then(data => {
+      if (data.user) {
+        localStorage.setItem('artecovert_session', JSON.stringify(data));
+        window.location.href = '/annuaire.html';
+      }
+    });
+  }
 
   async function handleLogin() {
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     const msg = document.getElementById('login-msg');
     const btn = document.getElementById('btn-login');
-
-    if (!email || !password) {
-      msg.className = 'msg error'; msg.textContent = '⚠️ Merci de remplir email et mot de passe.'; return;
-    }
-
+    if (!email || !password) { msg.className = 'msg error'; msg.textContent = '⚠️ Merci de remplir email et mot de passe.'; return; }
     btn.disabled = true; btn.textContent = 'Connexion…';
     msg.className = 'msg'; msg.textContent = '';
-
-    const { error } = await sb.auth.signInWithPassword({ email, password });
-    btn.disabled = false; btn.textContent = 'Accéder à l\'annuaire →';
-
-    if (error) {
-      msg.className = 'msg error';
-      msg.textContent = '❌ Email ou mot de passe incorrect.';
-    } else {
-      msg.className = 'msg success'; msg.textContent = '✅ Connexion réussie !';
-      setTimeout(() => window.location.href = '/annuaire.html', 800);
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'login', email, password })
+      });
+      const data = await res.json();
+      btn.disabled = false; btn.textContent = 'Accéder à l\'annuaire →';
+      if (!res.ok) {
+        msg.className = 'msg error'; msg.textContent = '❌ Email ou mot de passe incorrect.';
+      } else {
+        localStorage.setItem('artecovert_session', JSON.stringify(data));
+        msg.className = 'msg success'; msg.textContent = '✅ Connexion réussie !';
+        setTimeout(() => window.location.href = '/annuaire.html', 800);
+      }
+    } catch(e) {
+      btn.disabled = false; btn.textContent = 'Accéder à l\'annuaire →';
+      msg.className = 'msg error'; msg.textContent = '❌ Erreur de connexion.';
     }
   }
 
   function toggleReset() {
     const f = document.getElementById('reset-form');
     f.classList.toggle('show');
-    if (f.classList.contains('show')) {
-      document.getElementById('reset-email').value = document.getElementById('login-email').value;
-    }
+    if (f.classList.contains('show')) document.getElementById('reset-email').value = document.getElementById('login-email').value;
   }
 
   async function handleReset() {
@@ -178,14 +127,13 @@
     const msg = document.getElementById('reset-msg');
     if (!email) { msg.className = 'msg error'; msg.textContent = '⚠️ Entrez votre email.'; return; }
     msg.className = 'msg'; msg.textContent = 'Envoi…';
-    const { error } = await sb.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/index.html'
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'reset', email })
     });
-    if (error) {
-      msg.className = 'msg error'; msg.textContent = '❌ Erreur : ' + error.message;
-    } else {
-      msg.className = 'msg success'; msg.textContent = '✅ Email envoyé ! Vérifiez votre boîte mail.';
-    }
+    if (res.ok) { msg.className = 'msg success'; msg.textContent = '✅ Email envoyé ! Vérifiez votre boîte mail.'; }
+    else { msg.className = 'msg error'; msg.textContent = '❌ Erreur lors de l\'envoi.'; }
   }
 </script>
 </body>

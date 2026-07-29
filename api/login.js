@@ -68,7 +68,6 @@ export default async function handler(req) {
 
     } else if (action === 'reset') {
       // Réinitialisation mot de passe
-      const { redirectTo } = await req.json().catch(() => ({}));
       const res = await fetch(`${SUPABASE_URL}/auth/v1/recover`, {
         method: 'POST',
         headers: {

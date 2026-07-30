@@ -18,14 +18,12 @@ export default async function handler(req, res) {
 
     const userToken = authHeader.replace('Bearer ', '');
 
-    // Vérifier le token
     const verifyRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
       headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${userToken}` }
     });
 
     if (!verifyRes.ok) return res.status(401).json({ error: 'Token invalide' });
 
-    // Récupérer les acteurs avec la clé service
     const r = await fetch(`${SUPABASE_URL}/rest/v1/acteurs?select=*&order=created_at.desc`, {
       headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}` }
     });
@@ -34,7 +32,7 @@ export default async function handler(req, res) {
     return res.status(200).json(data);
 
   } catch (err) {
-    console.error('Acteurs error:', err);
+    console.error('Acteurs error:', err.message);
     return res.status(500).json({ error: 'Erreur serveur: ' + err.message });
   }
 }

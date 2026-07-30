@@ -177,7 +177,9 @@
       });
       if (res.status === 401) { window.location.href = '/index.html'; return; }
       const data = await res.json();
-      acteurs = data || [];
+      // S'assurer que data est bien un tableau
+      acteurs = Array.isArray(data) ? data : (data.data || data.acteurs || []);
+      console.log('Acteurs chargés:', acteurs.length);
       renderAll();
     } catch(e) {
       console.error('Erreur chargement acteurs:', e);

@@ -10,7 +10,20 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { email, password, action } = req.body;
+    // Parser le body manuellement
+    let body = req.body;
+    if (typeof body === 'string') {
+      body = JSON.parse(body);
+    }
+    if (!body) {
+      const chunks = [];
+      for await (const chunk of req) chunks.push(chunk);
+      body = JSON.parse(Buffer.concat(chunks).toString());
+    }
+
+    const { email, password, action } = body;
+
+    if (!action) return res.status(400).json({ error: 'Action manquante' });
 
     if (action === 'login') {
       const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
@@ -45,7 +58,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Action inconnue' });
 
   } catch (err) {
-    console.error('Login error:', err);
+    console.error('Login error:', err.message, err.stack);
     return res.status(500).json({ error: 'Erreur serveur: ' + err.message });
   }
 }

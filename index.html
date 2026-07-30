@@ -37,6 +37,8 @@
   .inscription-block p { font-size: 0.82rem; color: var(--gris); margin-bottom: 10px; line-height: 1.5; }
   .inscription-block a { display: inline-block; color: var(--vert); font-weight: 700; font-size: 0.88rem; text-decoration: none; }
   .inscription-block a:hover { text-decoration: underline; }
+  .new-password-form { display: none; }
+  .new-password-form.show { display: block; }
 </style>
 </head>
 <body>
@@ -46,6 +48,22 @@
     <h1>Couleur Végétale</h1>
     <p>Carte interactive des acteurs de la couleur végétale<br>Connectez-vous pour accéder à la carte</p>
   </div>
+  <!-- Formulaire nouveau mot de passe (affiché si lien de reset) -->
+  <div class="new-password-form" id="new-password-form">
+    <div class="section-title">🔑 Choisir un nouveau mot de passe</div>
+    <div class="group">
+      <label>Nouveau mot de passe</label>
+      <input type="password" id="new-password" placeholder="Minimum 6 caractères">
+    </div>
+    <div class="group">
+      <label>Confirmer le mot de passe</label>
+      <input type="password" id="new-password2" placeholder="••••••••">
+    </div>
+    <button class="btn" id="btn-new-password" onclick="handleNewPassword()">Enregistrer le nouveau mot de passe</button>
+    <div class="msg" id="new-password-msg"></div>
+  </div>
+
+  <div id="login-form">
   <div class="section-title">🔐 Connexion à l'annuaire</div>
   <div class="group">
     <label>Email</label>
@@ -69,11 +87,60 @@
     <p>Vous souhaitez apparaître sur la carte ?</p>
     <a href="/inscription.html">📝 Remplir le formulaire d'inscription →</a>
   </div>
+  </div> <!-- fin login-form -->
 </div>
 <script>
+  // Détecter si on arrive avec un token de reset dans l'URL
+  const hashParams = new URLSearchParams(window.location.hash.substring(1));
+  const accessToken = hashParams.get('access_token');
+  const tokenType = hashParams.get('type');
+
+  if (accessToken && tokenType === 'recovery') {
+    // Afficher le formulaire de nouveau mot de passe
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('new-password-form').classList.add('show');
+  }
+
+  async function handleNewPassword() {
+    const p1 = document.getElementById('new-password').value;
+    const p2 = document.getElementById('new-password2').value;
+    const msg = document.getElementById('new-password-msg');
+    const btn = document.getElementById('btn-new-password');
+
+    if (p1.length < 6) { msg.className = 'msg error'; msg.textContent = '⚠️ Mot de passe trop court (6 caractères minimum).'; return; }
+    if (p1 !== p2) { msg.className = 'msg error'; msg.textContent = '⚠️ Les mots de passe ne correspondent pas.'; return; }
+
+    btn.disabled = true; btn.textContent = 'Enregistrement…';
+
+    try {
+      // Utiliser le token de reset pour mettre à jour le mot de passe
+      const res = await fetch('https://dcrkzffhdwznmqokpkla.supabase.co/auth/v1/user', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjcmt6ZmZoZHd6bm1xb2twa2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwOTA1ODQsImV4cCI6MjA5NjY2NjU4NH0.q3mlZ3tcX1OO4pNOaP70zxZFnxvzBdmKT8EOY5WXfhc',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({ password: p1 })
+      });
+
+      btn.disabled = false; btn.textContent = 'Enregistrer le nouveau mot de passe';
+
+      if (res.ok) {
+        msg.className = 'msg success'; msg.textContent = '✅ Mot de passe mis à jour ! Redirection…';
+        setTimeout(() => { window.location.href = '/index.html'; }, 1500);
+      } else {
+        msg.className = 'msg error'; msg.textContent = '❌ Erreur lors de la mise à jour.';
+      }
+    } catch(e) {
+      btn.disabled = false; btn.textContent = 'Enregistrer le nouveau mot de passe';
+      msg.className = 'msg error'; msg.textContent = '❌ Erreur de connexion.';
+    }
+  }
+
   // Vérifier si déjà connecté
   const session = JSON.parse(localStorage.getItem('artecovert_session') || 'null');
-  if (session?.access_token) {
+  if (session?.access_token && !accessToken) {
     // Vérifier que le token est encore valide
     fetch('/api/session', {
       method: 'POST',

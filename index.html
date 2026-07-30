@@ -114,14 +114,10 @@
 
     try {
       // Utiliser le token de reset pour mettre à jour le mot de passe
-      const res = await fetch('https://dcrkzffhdwznmqokpkla.supabase.co/auth/v1/user', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjcmt6ZmZoZHd6bm1xb2twa2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwOTA1ODQsImV4cCI6MjA5NjY2NjU4NH0.q3mlZ3tcX1OO4pNOaP70zxZFnxvzBdmKT8EOY5WXfhc',
-          'Authorization': `Bearer ${accessToken}`
-        },
-        body: JSON.stringify({ password: p1 })
+      const res = await fetch('/api/update-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: p1, access_token: accessToken })
       });
 
       btn.disabled = false; btn.textContent = 'Enregistrer le nouveau mot de passe';

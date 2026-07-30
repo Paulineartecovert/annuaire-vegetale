@@ -1,58 +1,40 @@
-export const config = { runtime: 'edge' };
-
 const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
-export default async function handler(req) {
-  // CORS
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json',
-  };
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers });
-  }
-
-  if (req.method !== 'GET') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers });
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    // Vérifier que l'utilisateur est connecté via son JWT
-    const authHeader = req.headers.get('Authorization');
+    const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return new Response(JSON.stringify({ error: 'Non autorisé' }), { status: 401, headers });
+      return res.status(401).json({ error: 'Non autorisé' });
     }
 
     const userToken = authHeader.replace('Bearer ', '');
 
-    // Vérifier le token auprès de Supabase
+    // Vérifier le token
     const verifyRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${userToken}`,
-      }
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${userToken}` }
     });
 
-    if (!verifyRes.ok) {
-      return new Response(JSON.stringify({ error: 'Token invalide' }), { status: 401, headers });
-    }
+    if (!verifyRes.ok) return res.status(401).json({ error: 'Token invalide' });
 
-    // Token valide → récupérer les acteurs avec la clé service (côté serveur)
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/acteurs?select=*&order=created_at.desc`, {
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-      }
+    // Récupérer les acteurs avec la clé service
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/acteurs?select=*&order=created_at.desc`, {
+      headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}` }
     });
 
-    const data = await res.json();
-    return new Response(JSON.stringify(data), { status: 200, headers });
+    const data = await r.json();
+    return res.status(200).json(data);
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: 'Erreur serveur' }), { status: 500, headers });
+    console.error('Acteurs error:', err);
+    return res.status(500).json({ error: 'Erreur serveur: ' + err.message });
   }
 }

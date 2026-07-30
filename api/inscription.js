@@ -1,72 +1,55 @@
-export const config = { runtime: 'edge' };
-
 const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
-export default async function handler(req) {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json',
-  };
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers });
-  }
-
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers });
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const body = await req.json();
-
-    // Validation des champs obligatoires
+    const body = req.body;
     const required = ['prenom', 'nom', 'email', 'structure', 'site_web', 'adresse', 'ville', 'pays', 'description', 'recherche'];
     for (const field of required) {
       if (!body[field] || String(body[field]).trim() === '') {
-        return new Response(JSON.stringify({ error: `Champ manquant : ${field}` }), { status: 400, headers });
+        return res.status(400).json({ error: `Champ manquant : ${field}` });
       }
     }
 
-    // Insérer dans Supabase avec la clé service (invisible côté client)
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/acteurs`, {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/acteurs`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'apikey': SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
         'Prefer': 'return=minimal',
       },
       body: JSON.stringify({
-        prenom: body.prenom.trim(),
-        nom: body.nom.trim(),
+        prenom: body.prenom.trim(), nom: body.nom.trim(),
         structure: body.structure?.trim() || null,
-        email: body.email.trim(),
-        site_web: body.site_web?.trim() || null,
-        adresse: body.adresse?.trim() || null,
-        ville: body.ville.trim(),
+        email: body.email.trim(), site_web: body.site_web?.trim() || null,
+        adresse: body.adresse?.trim() || null, ville: body.ville.trim(),
         code_postal: body.code_postal?.trim() || null,
         pays: body.pays?.trim() || 'France',
         activites: body.activites || null,
-        description: body.description.trim(),
-        recherche: body.recherche.trim(),
-        latitude: body.latitude || null,
-        longitude: body.longitude || null,
+        description: body.description.trim(), recherche: body.recherche.trim(),
+        latitude: body.latitude || null, longitude: body.longitude || null,
         approuve: true,
       }),
     });
 
-    if (!res.ok) {
-      const err = await res.text();
+    if (!r.ok) {
+      const err = await r.text();
       console.error('Supabase error:', err);
-      return new Response(JSON.stringify({ error: 'Erreur lors de l\'insertion' }), { status: 500, headers });
+      return res.status(500).json({ error: "Erreur lors de l'insertion" });
     }
 
-    return new Response(JSON.stringify({ success: true }), { status: 200, headers });
+    return res.status(200).json({ success: true });
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: 'Erreur serveur' }), { status: 500, headers });
+    console.error('Inscription error:', err);
+    return res.status(500).json({ error: 'Erreur serveur: ' + err.message });
   }
 }

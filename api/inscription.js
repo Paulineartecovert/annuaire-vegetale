@@ -10,7 +10,14 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const body = req.body;
+    let body = req.body;
+    if (typeof body === 'string') body = JSON.parse(body);
+    if (!body) {
+      const chunks = [];
+      for await (const chunk of req) chunks.push(chunk);
+      body = JSON.parse(Buffer.concat(chunks).toString());
+    }
+
     const required = ['prenom', 'nom', 'email', 'structure', 'site_web', 'adresse', 'ville', 'pays', 'description', 'recherche'];
     for (const field of required) {
       if (!body[field] || String(body[field]).trim() === '') {
@@ -49,7 +56,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true });
 
   } catch (err) {
-    console.error('Inscription error:', err);
+    console.error('Inscription error:', err.message);
     return res.status(500).json({ error: 'Erreur serveur: ' + err.message });
   }
 }

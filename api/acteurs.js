@@ -18,18 +18,37 @@ export default async function handler(req, res) {
 
     const userToken = authHeader.replace('Bearer ', '');
 
+    // Vérifier que l'utilisateur est bien connecté
     const verifyRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${userToken}` }
+      headers: { 
+        'apikey': SUPABASE_ANON_KEY, 
+        'Authorization': `Bearer ${userToken}` 
+      }
     });
 
-    if (!verifyRes.ok) return res.status(401).json({ error: 'Token invalide' });
+    if (!verifyRes.ok) {
+      return res.status(401).json({ error: 'Token invalide' });
+    }
 
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/acteurs?select=*&order=created_at.desc`, {
-      headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}` }
+    // Récupérer TOUS les acteurs avec la clé service_role (bypass RLS)
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/acteurs?select=*&order=created_at.desc&limit=1000`, {
+      headers: { 
+        'apikey': SUPABASE_SERVICE_KEY, 
+        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
     });
+
+    if (!r.ok) {
+      const errText = await r.text();
+      console.error('Supabase error:', r.status, errText);
+      return res.status(500).json({ error: 'Erreur Supabase: ' + errText });
+    }
 
     const data = await r.json();
-    return res.status(200).json(data);
+    console.log('Nombre acteurs:', Array.isArray(data) ? data.length : 'pas un tableau', typeof data);
+    return res.status(200).json(Array.isArray(data) ? data : []);
 
   } catch (err) {
     console.error('Acteurs error:', err.message);

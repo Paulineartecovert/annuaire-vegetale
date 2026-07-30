@@ -9,7 +9,15 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    const { refresh_token } = req.body;
+    let body = req.body;
+    if (typeof body === 'string') body = JSON.parse(body);
+    if (!body) {
+      const chunks = [];
+      for await (const chunk of req) chunks.push(chunk);
+      body = JSON.parse(Buffer.concat(chunks).toString());
+    }
+
+    const { refresh_token } = body;
     if (!refresh_token) return res.status(200).json({ user: null });
 
     const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
@@ -19,11 +27,11 @@ export default async function handler(req, res) {
     });
 
     if (!r.ok) return res.status(200).json({ user: null });
-
     const data = await r.json();
     return res.status(200).json({ user: data.user, access_token: data.access_token, refresh_token: data.refresh_token });
 
   } catch (err) {
+    console.error('Session error:', err.message);
     return res.status(200).json({ user: null });
   }
 }

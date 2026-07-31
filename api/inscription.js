@@ -1,6 +1,3 @@
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -10,6 +7,9 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
+    const SUPABASE_URL = process.env.SUPABASE_URL;
+    const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+
     let body = req.body;
     if (typeof body === 'string') body = JSON.parse(body);
     if (!body) {
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     const required = ['prenom', 'nom', 'email', 'structure', 'site_web', 'adresse', 'ville', 'pays', 'description', 'recherche'];
     for (const field of required) {
       if (!body[field] || String(body[field]).trim() === '') {
-        return res.status(400).json({ error: `Champ manquant : ${field}` });
+        return res.status(400).json({ error: 'Champ manquant : ' + field });
       }
     }
 
@@ -29,20 +29,25 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'apikey': SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         'Prefer': 'return=minimal',
       },
       body: JSON.stringify({
-        prenom: body.prenom.trim(), nom: body.nom.trim(),
+        prenom: body.prenom.trim(),
+        nom: body.nom.trim(),
         structure: body.structure?.trim() || null,
-        email: body.email.trim(), site_web: body.site_web?.trim() || null,
-        adresse: body.adresse?.trim() || null, ville: body.ville.trim(),
+        email: body.email.trim(),
+        site_web: body.site_web?.trim() || null,
+        adresse: body.adresse?.trim() || null,
+        ville: body.ville.trim(),
         code_postal: body.code_postal?.trim() || null,
         pays: body.pays?.trim() || 'France',
         activites: body.activites || null,
-        description: body.description.trim(), recherche: body.recherche.trim(),
-        latitude: body.latitude || null, longitude: body.longitude || null,
+        description: body.description.trim(),
+        recherche: body.recherche.trim(),
+        latitude: body.latitude || null,
+        longitude: body.longitude || null,
         approuve: true,
       }),
     });
@@ -50,7 +55,7 @@ export default async function handler(req, res) {
     if (!r.ok) {
       const err = await r.text();
       console.error('Supabase error:', err);
-      return res.status(500).json({ error: "Erreur lors de l'insertion" });
+      return res.status(500).json({ error: "Erreur lors de l'insertion", detail: err });
     }
 
     return res.status(200).json({ success: true });

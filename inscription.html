@@ -1,67 +1,267 @@
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rejoindre l'annuaire – Couleur Végétale</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --vert: #4a7c59; --vert-clair: #7aad8a; --vert-pale: #eef4f0; --beige: #f5f0e8; --gris: #6b7280; --ombre: 0 4px 20px rgba(0,0,0,0.08); }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--beige); color: #2d2d2d; min-height: 100vh; }
+  header { background: linear-gradient(135deg, var(--vert) 0%, #2d5a3d 100%); color: white; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+  .header-logo { display: flex; align-items: center; gap: 12px; }
+  .header-logo .icon { font-size: 28px; }
+  header h1 { font-size: 1.1rem; font-weight: 700; }
+  header p { font-size: 0.78rem; opacity: 0.8; margin-top: 2px; }
+  .header-link { color: rgba(255,255,255,0.8); font-size: 0.82rem; text-decoration: none; }
+  .header-link:hover { color: white; }
+  .container { max-width: 720px; margin: 0 auto; padding: 40px 24px; }
+  .page-title { margin-bottom: 28px; }
+  .page-title h2 { font-size: 1.6rem; font-weight: 800; color: var(--vert); margin-bottom: 8px; }
+  .page-title p { color: var(--gris); font-size: 0.95rem; line-height: 1.6; }
+  .badge-public { display: inline-block; background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; margin-bottom: 12px; }
+  .form-card { background: white; border-radius: 16px; padding: 32px; box-shadow: var(--ombre); }
+  .form-section { margin-bottom: 28px; }
+  .form-section-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--vert); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--vert-pale); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: 0.85rem; font-weight: 600; }
+  label span.req { color: #e53e3e; margin-left: 2px; }
+  input, textarea { padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px; font-size: 0.9rem; font-family: inherit; outline: none; transition: border 0.2s; background: white; }
+  input:focus, textarea:focus { border-color: var(--vert); box-shadow: 0 0 0 3px rgba(74,124,89,0.1); }
+  textarea { resize: vertical; min-height: 100px; }
+  .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; }
+  .checkbox-item { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; user-select: none; }
+  .checkbox-item:hover { border-color: var(--vert-clair); background: var(--vert-pale); }
+  .checkbox-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--vert); }
+  .checkbox-item.checked { border-color: var(--vert); background: var(--vert-pale); font-weight: 600; }
+  .autre-precision { display: none; margin-top: 12px; }
+  .autre-precision.show { display: block; }
+  .btn-submit { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--vert), #2d5a3d); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(74,124,89,0.35); }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .form-msg { font-size: 0.85rem; text-align: center; margin-top: 14px; padding: 12px; border-radius: 8px; display: none; }
+  .form-msg.error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; display: block; }
+  .footer-copy { text-align: center; margin-top: 28px; font-size: 0.76rem; color: #9ca3af; }
+  @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .container { padding: 24px 16px; } header { padding: 16px 20px; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-logo">
+    <span class="icon">🌿</span>
+    <div>
+      <h1>Annuaire de la Couleur Végétale</h1>
+      <p>Formulaire d'inscription</p>
+    </div>
+  </div>
+  <a href="/index.html" class="header-link">← Déjà membre ? Se connecter</a>
+</header>
 
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+<div class="container">
+  <div class="page-title">
+    <span class="badge-public">✅ Accès libre – Aucun compte requis</span>
+    <h2>Rejoindre l'annuaire 🌱</h2>
+    <p>Vous travaillez avec les couleurs végétales ? Référencez-vous gratuitement sur la carte interactive.</p>
+  </div>
 
-  try {
-    const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+  <div class="form-card">
+    <div class="form-section">
+      <div class="form-section-title">👤 Informations personnelles</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Prénom <span class="req">*</span></label>
+          <input type="text" id="f-prenom" placeholder="Marie">
+        </div>
+        <div class="form-group">
+          <label>Nom <span class="req">*</span></label>
+          <input type="text" id="f-nom" placeholder="Dupont">
+        </div>
+        <div class="form-group full">
+          <label>Nom de ton entreprise <span class="req">*</span></label>
+          <input type="text" id="f-structure" placeholder="Atelier des Teintures Naturelles">
+        </div>
+        <div class="form-group">
+          <label>Email <span class="req">*</span></label>
+          <input type="email" id="f-email" placeholder="marie@exemple.fr">
+        </div>
+        <div class="form-group">
+          <label>Lien du site internet <span class="req">*</span></label>
+          <input type="url" id="f-site" placeholder="https://...">
+        </div>
+      </div>
+    </div>
 
-    let body = req.body;
-    if (typeof body === 'string') body = JSON.parse(body);
-    if (!body) {
-      const chunks = [];
-      for await (const chunk of req) chunks.push(chunk);
-      body = JSON.parse(Buffer.concat(chunks).toString());
-    }
+    <div class="form-section">
+      <div class="form-section-title">📍 Localisation</div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Adresse <span class="req">*</span></label>
+          <input type="text" id="f-adresse" placeholder="12 rue des Teinturiers">
+        </div>
+        <div class="form-group">
+          <label>Ville <span class="req">*</span></label>
+          <input type="text" id="f-ville" placeholder="Lyon">
+        </div>
+        <div class="form-group">
+          <label>Code postal</label>
+          <input type="text" id="f-cp" placeholder="69000">
+        </div>
+        <div class="form-group full">
+          <label>Pays <span class="req">*</span></label>
+          <input type="text" id="f-pays" placeholder="France" value="France">
+        </div>
+      </div>
+    </div>
 
-    const required = ['prenom', 'nom', 'email', 'structure', 'site_web', 'adresse', 'ville', 'pays', 'description', 'recherche'];
-    for (const field of required) {
-      if (!body[field] || String(body[field]).trim() === '') {
-        return res.status(400).json({ error: 'Champ manquant : ' + field });
-      }
-    }
+    <div class="form-section">
+      <div class="form-section-title">🎨 Activités</div>
+      <div class="checkbox-group">
+        <label class="checkbox-item"><input type="checkbox" value="Agricultrice tinctoriale"> 🌾 Agricultrice tinctoriale</label>
+        <label class="checkbox-item"><input type="checkbox" value="Jardin tinctorial"> 🌱 Jardin tinctorial</label>
+        <label class="checkbox-item"><input type="checkbox" value="Productrice de fibres naturelles"> 🪢 Productrice de fibres naturelles</label>
+        <label class="checkbox-item"><input type="checkbox" value="Extracteur de colorants végétaux"> 🧪 Extracteur de colorants végétaux</label>
+        <label class="checkbox-item"><input type="checkbox" value="Producteur de pigments végétaux"> 🎨 Producteur de pigments végétaux</label>
+        <label class="checkbox-item"><input type="checkbox" value="Teinturière"> 🪣 Teinturière</label>
+        <label class="checkbox-item"><input type="checkbox" value="Ennoblisseur"> 🧵 Ennoblisseur</label>
+        <label class="checkbox-item"><input type="checkbox" value="Artisane savonnière"> 🧼 Artisane savonnière</label>
+        <label class="checkbox-item"><input type="checkbox" value="Autres cosmétiques que savons"> 🌸 Autres cosmétiques que savons</label>
+        <label class="checkbox-item"><input type="checkbox" value="Artiste utilisant la couleur végétale"> 🎭 Artiste utilisant la couleur végétale</label>
+        <label class="checkbox-item"><input type="checkbox" value="Beaux-arts : Encres / Enluminure / Peinture naturelle"> 🖌️ Beaux-arts : Encres / Enluminure / Peinture naturelle</label>
+        <label class="checkbox-item"><input type="checkbox" value="Tisserande / fileuse / tricoteuse"> 🧶 Tisserande / fileuse / tricoteuse</label>
+        <label class="checkbox-item"><input type="checkbox" value="Créatrice mode / styliste"> 👗 Créatrice mode / styliste</label>
+        <label class="checkbox-item"><input type="checkbox" value="Marque"> 🏷️ Marque</label>
+        <label class="checkbox-item"><input type="checkbox" value="Formatrice / Centre de formation"> 📚 Formatrice / Centre de formation</label>
+        <label class="checkbox-item"><input type="checkbox" value="Chercheuse / scientifique"> 🔬 Chercheuse / scientifique</label>
+        <label class="checkbox-item"><input type="checkbox" value="Historienne / Ethnobotaniste / Archéologue"> 📜 Historienne / Ethnobotaniste / Archéologue</label>
+        <label class="checkbox-item"><input type="checkbox" value="Médiatrice / animatrice tinctoriale"> 🤝 Médiatrice / animatrice tinctoriale</label>
+        <label class="checkbox-item"><input type="checkbox" value="Association"> 🫂 Association</label>
+        <label class="checkbox-item"><input type="checkbox" value="Autres ressources colorantes (Cochenille, Ocres...)"> 🌈 Autres ressources colorantes (Cochenille, Ocres...)</label>
+        <label class="checkbox-item" id="cb-autre-label"><input type="checkbox" id="cb-autre" value="Autre"> ✏️ Autre</label>
+      </div>
+      <div class="autre-precision" id="autre-precision">
+        <div class="form-group" style="margin-top:12px">
+          <label>Précisez votre activité</label>
+          <input type="text" id="f-autre-precision" placeholder="Décrivez votre activité…">
+        </div>
+      </div>
+    </div>
 
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/acteurs`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        'Prefer': 'return=minimal',
-      },
-      body: JSON.stringify({
-        prenom: body.prenom.trim(),
-        nom: body.nom.trim(),
-        structure: body.structure?.trim() || null,
-        email: body.email.trim(),
-        site_web: body.site_web?.trim() || null,
-        adresse: body.adresse?.trim() || null,
-        ville: body.ville.trim(),
-        code_postal: body.code_postal?.trim() || null,
-        pays: body.pays?.trim() || 'France',
-        activites: body.activites || null,
-        description: body.description.trim(),
-        recherche: body.recherche.trim(),
-        latitude: body.latitude || null,
-        longitude: body.longitude || null,
-        approuve: true,
-      }),
+    <div class="form-section">
+      <div class="form-section-title">🔍 Ce que tu cherches</div>
+      <div class="form-group">
+        <label>Un lieu, un fournisseur… <span class="req">*</span></label>
+        <textarea id="f-recherche" placeholder="Ex : Je cherche un fournisseur de fibres naturelles, un lieu de formation…"></textarea>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">📝 Présentation</div>
+      <div class="form-group">
+        <label>Décrivez votre activité <span class="req">*</span></label>
+        <textarea id="f-description" placeholder="Parlez de votre pratique, vos spécialités, ce qui vous rend unique…"></textarea>
+      </div>
+    </div>
+
+    <button class="btn-submit" id="btn-submit" onclick="submitForm()">
+      🌿 Rejoindre l'annuaire
+    </button>
+    <div class="form-msg" id="form-msg"></div>
+  </div>
+
+  <div class="footer-copy">© Tous droits réservés à ArtEcoVert</div>
+</div>
+
+<script>
+  document.querySelectorAll('.checkbox-item input[type="checkbox"]').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+      cb.closest('.checkbox-item').classList.toggle('checked', cb.checked);
     });
+  });
 
-    if (!r.ok) {
-      const err = await r.text();
-      console.error('Supabase error:', err);
-      return res.status(500).json({ error: "Erreur lors de l'insertion", detail: err });
+  document.getElementById('cb-autre').addEventListener('change', function() {
+    document.getElementById('autre-precision').classList.toggle('show', this.checked);
+  });
+
+  async function geocodeVille(ville, adresse, pays) {
+    try {
+      var q = adresse ? adresse + ', ' + ville + ', ' + pays : ville + ', ' + pays;
+      var r = await fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=1');
+      var d = await r.json();
+      if (d.length > 0) return { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) };
+    } catch(e) {}
+    return null;
+  }
+
+  async function submitForm() {
+    var prenom = document.getElementById('f-prenom').value.trim();
+    var nom = document.getElementById('f-nom').value.trim();
+    var email = document.getElementById('f-email').value.trim();
+    var site_web = document.getElementById('f-site').value.trim();
+    var adresse = document.getElementById('f-adresse').value.trim();
+    var ville = document.getElementById('f-ville').value.trim();
+    var pays = document.getElementById('f-pays').value.trim();
+    var description = document.getElementById('f-description').value.trim();
+    var recherche = document.getElementById('f-recherche').value.trim();
+    var structure = document.getElementById('f-structure').value.trim();
+    var msg = document.getElementById('form-msg');
+    var btn = document.getElementById('btn-submit');
+
+    if (!prenom || !nom || !email || !structure || !site_web || !adresse || !ville || !pays || !description || !recherche) {
+      msg.className = 'form-msg error';
+      msg.textContent = 'Merci de remplir tous les champs obligatoires (*)';
+      return;
     }
 
-    return res.status(200).json({ success: true });
+    btn.disabled = true;
+    btn.textContent = 'Inscription en cours...';
+    msg.style.display = 'none';
 
-  } catch (err) {
-    console.error('Inscription error:', err.message);
-    return res.status(500).json({ error: 'Erreur serveur: ' + err.message });
+    var coords = await geocodeVille(ville, adresse, pays);
+
+    var activites = [];
+    document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked').forEach(function(el) {
+      if (el.id !== 'cb-autre') activites.push(el.value);
+    });
+    if (document.getElementById('cb-autre').checked) {
+      var precision = document.getElementById('f-autre-precision').value.trim();
+      activites.push(precision ? 'Autre : ' + precision : 'Autre');
+    }
+
+    try {
+      var response = await fetch('/api/inscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prenom: prenom, nom: nom, structure: structure, email: email,
+          site_web: site_web, adresse: adresse, ville: ville,
+          code_postal: document.getElementById('f-cp').value.trim() || null,
+          pays: pays, activites: activites.length ? activites : null,
+          description: description, recherche: recherche,
+          latitude: coords ? coords.lat : null,
+          longitude: coords ? coords.lng : null
+        })
+      });
+
+      btn.disabled = false;
+      btn.textContent = 'Rejoindre l\'annuaire';
+
+      if (!response.ok) {
+        msg.className = 'form-msg error';
+        msg.textContent = 'Erreur lors de l\'inscription. Veuillez reessayer.';
+        return;
+      }
+
+      window.location.href = '/confirmation.html?prenom=' + encodeURIComponent(prenom);
+
+    } catch(e) {
+      btn.disabled = false;
+      btn.textContent = 'Rejoindre l\'annuaire';
+      msg.className = 'form-msg error';
+      msg.textContent = 'Probleme de connexion. Verifiez votre reseau et reessayez.';
+    }
   }
-}
+</script>
+</body>
+</html>
